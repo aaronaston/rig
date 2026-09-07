@@ -1,0 +1,17 @@
+schema_version = 1
+
+slug = "nadia"
+name = "Nadia"
+gender = "woman"
+pronouns = "she/her"
+role = "software-engineer"
+manager = "md"
+operator = "Aaron"
+
+status = "provisioning"
+worktree = "worktree"
+branch = "fleet/nadia"
+beads_actor = "Nadia"
+mailbox_address = "fleet/nadia"
+mailbox_state = "unconfigured"
+

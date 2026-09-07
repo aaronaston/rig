@@ -1,0 +1,20 @@
+#!/bin/sh
+
+set -eu
+
+if ! command -v cmake >/dev/null 2>&1 || ! command -v glibtool >/dev/null 2>&1; then
+    printf '%s\n' 'Rig needs CMake and GNU libtool to build Emacs vterm.' >&2
+    printf '%s\n' 'Install them with: HOMEBREW_NO_AUTO_UPDATE=1 brew install cmake libtool' >&2
+    exit 1
+fi
+
+exec emacs --batch --eval "(progn
+  (require 'package)
+  (add-to-list 'package-archives '(\"melpa\" . \"https://melpa.org/packages/\") t)
+  (package-initialize)
+  (unless (package-installed-p 'vterm)
+    (package-refresh-contents)
+    (package-install 'vterm))
+  (setq vterm-always-compile-module t)
+  (require 'vterm)
+  (princ (format \"Rig vterm ready: %s\\n\" (locate-library \"vterm\"))))"

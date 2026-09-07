@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+
+rig_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+rig_emacs_bin=${RIG_EMACS_BIN:-emacs}
+
+exec "$rig_emacs_bin" \
+  --load "$rig_root/emacs/rig.el" \
+  --funcall rig-md

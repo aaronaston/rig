@@ -1,0 +1,49 @@
+# Rig Beads Workflow Context
+
+Use the root Beads workspace as Rig's durable task and status system. The
+knowledgebase preserves sources, decisions, and synthesis; it is not a parallel
+task queue.
+
+## Authority
+
+- Rig seats and fleet members are authorized to use local Git for assigned
+  work, subject to the scope in the applicable `AGENTS.md` files.
+- MD may create, inspect, repair, and retire fleet-member worktrees and
+  branches after preserving or deliberately disposing of unique work.
+- Fleet members may manage their own worktree and branch. They must not modify
+  another member's worktree or branch, or the main checkout, unless MD
+  explicitly reassigns that scope.
+- Remote pushes, force-pushes, remote configuration changes, and Dolt remote
+  synchronization require separate direction from Aaron or MD.
+- A higher-level sandbox or orchestrator restriction still wins. If one blocks
+  an authorized operation, report that external restriction precisely.
+
+## Workflow
+
+- Run `bd ready`, then `bd show <id>` before starting assigned work.
+- Create a Beads issue before implementation when no suitable issue exists.
+- Claim work with `bd update <id> --claim`.
+- Use inline `bd update` flags; do not use interactive `bd edit`.
+- Keep discovered follow-up work, dependencies, and blockers in Beads rather
+  than Markdown TODO lists.
+- Close completed issues with `bd close <id> --reason="..."` only after the
+  acceptance criteria and relevant validation have been satisfied.
+- Before ending an implementation session, close completed issues, run the
+  relevant quality gates, and report changed files, validation, issue status,
+  and any remaining publication or synchronization step.
+
+## Useful Commands
+
+```bash
+bd ready
+bd list --status=open
+bd list --status=in_progress
+bd blocked
+bd show <id>
+bd update <id> --claim
+bd close <id> --reason="Completed"
+bd stats
+```
+
+The repository currently has no Git remote. Beads data is local unless Aaron or
+MD separately configures and directs synchronization.

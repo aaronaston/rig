@@ -1,0 +1,23 @@
+#!/bin/sh
+
+set -eu
+
+if [ "$#" -ne 1 ]; then
+    printf '%s\n' 'Usage: rig-fleet-emacs <member-slug>' >&2
+    exit 2
+fi
+
+member=$1
+case "$member" in
+    *[!a-z0-9-]*|'')
+        printf '%s\n' 'Fleet member slug must use lowercase letters, digits, and hyphens.' >&2
+        exit 2
+        ;;
+esac
+
+rig_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+rig_emacs_bin=${RIG_EMACS_BIN:-emacs}
+
+exec "$rig_emacs_bin" \
+  --load "$rig_root/emacs/rig.el" \
+  --eval "(rig-fleet-member \"$member\")"

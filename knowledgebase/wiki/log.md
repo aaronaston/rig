@@ -1,0 +1,115 @@
+# Rig Knowledgebase Log
+
+Append-only chronological record of wiki maintenance.
+
+## [2026-09-05] init | Control Center Brain
+
+Initialized wiki scaffold.
+
+## [2026-09-05] ingest | Wheelhouse and initial user intent
+
+Read the shared conversation through prompt navigation and verified the two cited Yegge essays. Preserved selected excerpts and retrieval metadata, with explicit full-capture limits. Recorded the tmux correction, initial requirements, and a minimal design proposal. See [source record](sources/wheelhouse.md) and [scope](decisions/initial-scope.md).
+
+## [2026-09-05] lint | Initial brain
+
+Checked every relative Markdown link in the brain: zero broken links. Indexed all synthesis, decision, and source pages. Added matching brain entry-point guidance to root AGENTS.md and CLAUDE.md.
+
+## [2026-09-05] decision | Rig and Managing Director
+
+Captured the user's functional naming direction. Rig is the working name; Managing Director (`md/`) is the sole initial seat, with it pronouns. This supersedes the two-seat plan and metaphorical names. Created the seat README, revised active scope and proposal pages, mirrored root guidance, and updated Beads epic and remaining tasks. Runtime and responsibilities remain undecided.
+
+## [2026-09-05] decision | MD full remit and Emacs console
+
+Recorded MD responsibility for planning, implementation, and review, and Emacs as the console. Future seats/fleet remain outside the initial build. Updated the seat README and mirrored root guidance. Local PATH discovery found Emacs, tmux, and Codex; Claude was not found on this shell PATH (not proof it is absent elsewhere).
+
+## [2026-09-05] decision | MD session defaults
+
+Recorded Codex CLI, `gpt-5.6-sol`, and high reasoning effort as replaceable MD session defaults. Added a runner-neutral TOML declaration, preserved the user direction, checked local Codex CLI 0.153.1, and cited official OpenAI model and configuration documentation. No session was launched.
+
+## [2026-09-06] maintenance | Rename brain directory to knowledgebase
+
+Renamed the on-disk project documentation directory from `brain/` to `knowledgebase/`. Updated current repository instructions, MD links, wiki titles, and maintained-page terminology. Preserved older log entries and immutable raw captures as historical records, including Yegge's own `brain/` terminology.
+
+## [2026-09-06] implementation | First Emacs MD console
+
+Added an Emacs command that creates or attaches to persistent tmux session `rig-md`, reads MD's runner-neutral defaults, and starts Codex from the repository root. Added terminal launcher, status and detach commands, operating instructions, and the v0 lifecycle decision. Handoff recovery still requires an end-to-end session test.
+
+## [2026-09-06] fix | Codex display in Emacs term
+
+Reproduced the first launch outside Emacs and confirmed that MD completed its startup turn and waited for input; the agent was not looping. A brief Emacs attachment showed that built-in `term` did not retain Codex's alternate-screen display. Changed the launcher to use Codex inline mode via `--no-alt-screen`; live Emacs interaction still requires verification.
+
+The original launcher also submitted an automatic startup prompt. Its normal tool activity and `Working` indicator could appear to be a loop during the first Emacs run. Removed that automatic turn: new MD sessions now open idle and wait for Aaron's input, while root project instructions establish the MD role.
+
+A second controlled launch exposed a Codex update-choice screen before the input prompt. Updated the installed CLI from 0.153.1 to 0.153.4 rather than disabling update checks. The final detached launch showed `gpt-5.6-sol high`, the Rig repository as working directory, and an idle input prompt with no automatic work. The corrected `rig-md` session was left running for Aaron to attach; live keyboard interaction inside Emacs remains the user verification step.
+
+## [2026-09-06] decision | Seat directory is the working directory
+
+Changed the MD launch contract so new sessions start in `md/`, with the parent Rig repository granted as an additional work area. Added closer seat-specific `AGENTS.md` and `CLAUDE.md` instructions. This separates the seat's home and local context from the larger set of files it may edit. The already-running MD session retains its original working directory until it exits and a new session starts.
+
+## [2026-09-06] fix | Reliable escape from the MD terminal
+
+The standard Emacs `term` escape sequences were reaching Codex instead of returning keyboard control to Emacs during live use. Added a Rig terminal minor mode whose higher-priority map reserves `F12` as a keyboard-control toggle and also reserves the documented line-mode, character-mode, and detach sequences. Updated the operating and lifecycle documentation.
+
+## [2026-09-06] fix | Replace built-in term with vterm
+
+Live use showed that Codex's in-place status redraws accumulated as scrolling lines in Emacs's built-in `term`, even after inline mode made the display visible. Changed Rig's required terminal backend to `vterm`, restored Codex's normal alternate-screen rendering, added a small tmux attachment wrapper, and added a reproducible dependency installer. The change requires CMake and the Emacs vterm package before live verification.
+
+## [2026-09-06] validation | Vterm installed and loaded
+
+Installed CMake, GNU libtool, and MELPA `vterm` version `20260730.1414`. The first native-module build exposed the missing `glibtool` dependency; after installing GNU libtool, compilation succeeded. A clean Emacs 31.1 batch process loaded `vterm.elc` and `vterm-module.so` and created a `vterm-mode` smoke-test buffer. Added a terminal-backend source record and updated the installer dependency check. Graphical Codex rendering remains the live acceptance check.
+
+## [2026-09-06] decision | MD pronoun preference and bootstrap boundary
+
+Aaron invited MD to choose their pronouns during the first live Rig session. MD chose they/them: singular *they* recognizes the seat as a collaborator without assigning a gender. This supersedes the provisional use of *it*. Recorded the exchange as an immutable source, updated the seat definition and session-loaded instructions, mirrored runner guidance, and clarified that `md/README.md` is the durable human-readable definition while `md/AGENTS.md` is the effective Codex session bootstrap.
+
+## [2026-09-06] decision | MD delegation and first fleet member
+
+Recorded Aaron as operator and MD as his delegate for requirements capture, Beads work definition, fleet orchestration, and output validation. Accepted MD ownership of onboarding, cross-boarding, and off-boarding. MD selected Nadia, a woman using she/her pronouns, as Rig's first Software Engineer. Defined `fleet/nadia/` as her durable home and `worktree/` as her replaceable isolated checkout.
+
+## [2026-09-06] implementation | Nadia provisioning scaffold
+
+Added Nadia's member record, effective agent instructions, runner-neutral session defaults, reusable fleet worktree provisioner, and generic Emacs fleet launcher. Confirmed that installed `bd mail` delegates to an external provider and that none is configured; Bead `beads-tests-dze.2` tracks provider selection and delivery proof. Git policy prevented creation of the actual worktree in this session, so Nadia remains provisioning rather than ready.
+
+## [2026-09-06] source | Codex AGENTS.md discovery
+
+Recorded OpenAI's documented root-to-working-directory instruction discovery and precedence. Used it to validate starting Nadia in her durable home while exposing her isolated worktree as an additional writable area.
+
+## [2026-09-06] source | Gas Town mail boundary
+
+Verified that `bd mail` expects an external provider and that Gas Town's provider uses a separate town-level Beads database for persistent messages and agent identity. Recorded that enabling `gt mail` would require adopting more than a delegate string; Rig must choose a provider architecture before provisioning Nadia's mailbox.
+
+## [2026-09-07] decision | Local Git authority
+
+Recorded Aaron's direction that all Rig seats may modify local Git for assigned work and that fleet members may manage their own worktrees. Added project-owned authority outside generated Beads blocks, mirrored runner instructions, and defined exact-target and preservation safeguards. Remote push, remote configuration, force-push, and Dolt remote sync remain separately directed. A higher-level session sandbox can still withhold `.git` writes despite repository authorization.
+
+## [2026-09-07] decision | Rig Roster, fleet pull, and optional mail
+
+Recorded the accepted Rig Roster name, automatic startup, ordinary window close/reopen requirement, and main-window identity action. Accepted pull-based fleet work and removed mailbox provisioning as a hard readiness gate for Nadia. Beads remains authoritative for work and review; mail is optional notification infrastructure. Updated the fleet lifecycle, Nadia's provisioning description, source index, and active Beads requirements.
+
+## [2026-09-07] lint | Fleet pull and optional-mail update
+
+Checked all relative links under `knowledgebase/wiki/` after adding the operator source and revising the fleet lifecycle: zero broken links. Reconciled the root overview and Nadia's current provisioning description with the new optional-mail decision.
+
+## [2026-09-07] ingest | Rig Roster interaction decisions
+
+Recorded start-or-attach behavior, `M-x rig-roster` and `C-c r` reopen controls, and the proposed name/task/status entry content. Preserved the observability limit: tmux presence and Beads assignment are available, but they do not prove whether Codex is actively working or waiting at its prompt.
+
+## [2026-09-07] lint | Rig Roster interaction update
+
+Checked all relative links under `knowledgebase/wiki/` after the follow-up source update: zero broken links.
+
+## [2026-09-07] decision | Rig Roster state and task summary
+
+Accepted a V1 model separating lifecycle, tmux session, and Beads work state. Limited each fleet member to one active implementation bead, defined no active assignment as availability, and allowed MD to show one current task title plus an additional-task count.
+
+## [2026-09-07] lint | Rig Roster state-model update
+
+Checked all relative links under `knowledgebase/wiki/` after recording the state model: zero broken links.
+
+## [2026-09-07] decision | Rig Roster discovery, refresh, and width
+
+Accepted declarative seat/member manifests, action-triggered and ten-second visible refresh, conventional `g` manual refresh, and twenty-percent width bounded to twenty-four through forty columns. Marked the Rig Roster Bead implementation-ready and released it to the unassigned fleet pool.
+
+## [2026-09-07] lint | Final Rig Roster requirements
+
+Checked all relative links under `knowledgebase/wiki/` after finalizing and releasing the feature: zero broken links. Confirmed Nadia's filtered ready-work query returns only the Rig Roster bead without claiming it.

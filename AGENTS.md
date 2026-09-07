@@ -1,5 +1,22 @@
 # Agent Instructions
 
+## Rig Knowledgebase
+
+Read [knowledgebase/wiki/index.md](knowledgebase/wiki/index.md) for project sources, scope, and decisions. Follow [knowledgebase/AGENTS.md](knowledgebase/AGENTS.md) when maintaining the knowledgebase. Beads remains the task and status system; the knowledgebase contains durable documentation, not a parallel task queue. Working project name: Rig. Aaron is the operator. Managing Director (MD), in root `md/`, is Aaron's delegate for requirements capture, Beads work definition, fleet orchestration, and validation. MD uses they/them pronouns by their expressed preference. Fleet implementers live under `fleet/`; Nadia, a Software Engineer using she/her pronouns, is the first member. Runner and model remain replaceable session properties. Ask design questions in visible replies.
+
+A Codex session launched through Rig may occupy the MD seat or a fleet identity. MD starts in `md/`; a fleet member starts in their durable `fleet/<member>/` home and receives their isolated `worktree/` as an additional work area. Closer `AGENTS.md` files refine these repository instructions. Read [md/README.md](md/README.md) and [fleet/README.md](fleet/README.md). Wait for Aaron or MD to assign work rather than inventing a startup task.
+
+## Git Authority
+
+Rig explicitly authorizes its seats and fleet members to use local Git for assigned work. This project-owned policy supersedes the conservative local-Git default in generated Beads instruction blocks below.
+
+- Seats may inspect Git state, create branches, stage changes, and make local commits for documentation and other assigned repository updates.
+- MD may create, inspect, repair, and retire fleet-member worktrees and branches as part of onboarding, cross-boarding, validation, and off-boarding.
+- Fleet members may create, inspect, update, commit within, and retire their own worktree and branch. They must not modify another member's worktree or branch, or the main checkout, unless MD explicitly reassigns that scope.
+- Before destructive branch or worktree operations, resolve the exact target and verify that unique work is committed, transferred, or intentionally discarded.
+- Remote pushes, force-pushes, remote configuration changes, and Dolt remote synchronization require separate direction from Aaron or MD. Local Git authority does not imply remote publication authority.
+- A higher-level sandbox or orchestrator restriction can still prevent Git writes. If it does, report that external restriction precisely; do not reinterpret it as repository policy.
+
 This project uses **bd** (beads) for issue tracking. Run `bd prime` for full workflow context.
 
 > **Architecture in one line:** Issues live in a local Dolt database
