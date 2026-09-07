@@ -24,6 +24,6 @@ remote publication unless Aaron or MD separately directs it.
 
 Current roster:
 
-- [Nadia](nadia/README.md) — Software Engineer; woman; she/her; provisioning
+- [Nadia](nadia/README.md) — Software Engineer; woman; she/her; ready
 
 Lifecycle policy is recorded in the [fleet decision](../knowledgebase/wiki/decisions/fleet-member-lifecycle.md).

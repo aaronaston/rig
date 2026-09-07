@@ -125,3 +125,7 @@ Added shared fleet defaults with optional per-member overrides and extended the 
 ## [2026-09-07] lint | Runtime policy update
 
 Checked all relative links across twenty Markdown files under `knowledgebase/wiki/` after adding the runtime source and decisions: zero broken links. Reconciled the root, MD, fleet, and Nadia documentation with the shared fleet defaults and launch-time restart boundary.
+
+## [2026-09-07] validation | Nadia Luna Auto-review cycle
+
+Relaunched Nadia after preserving her clean, reviewed worktree. The new Codex 0.153.4 session visibly reported `gpt-5.6-luna high`. Nadia claimed and returned a bounded validation bead through shared Beads, ran `git -C worktree update-index --refresh`, confirmed a clean `fleet/nadia` branch, and wrote review evidence. Auto-review handled eligible command requests in-session without surfacing a prompt to Aaron. A Computer Use attempt to inspect the Codex app was denied separately, matching the documented exclusion. Nadia now satisfies the required onboarding gates and is marked ready.

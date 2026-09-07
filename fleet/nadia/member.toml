@@ -8,10 +8,9 @@ role = "software-engineer"
 manager = "md"
 operator = "Aaron"
 
-status = "provisioning"
+status = "ready"
 worktree = "worktree"
 branch = "fleet/nadia"
 beads_actor = "Nadia"
 mailbox_address = "fleet/nadia"
 mailbox_state = "unconfigured"
-

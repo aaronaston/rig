@@ -38,4 +38,4 @@ Start with the [overview](overview.md). Maintenance history is in the [log](log.
 ## Fleet
 
 - [Fleet registry](../../fleet/README.md): implementer homes and roster.
-- [Nadia](../../fleet/nadia/README.md): first Software Engineer; onboarding is in progress.
+- [Nadia](../../fleet/nadia/README.md): first Software Engineer; onboarding and refreshed runtime validation are complete.

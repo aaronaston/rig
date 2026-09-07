@@ -16,9 +16,8 @@ lifecycle state. Nadia inherits the shared fleet
 [`session-defaults.toml`](../session-defaults.toml), while her local
 [`session-defaults.toml`](session-defaults.toml) is an optional override layer.
 
-Nadia is currently **provisioning**. Her home, worktree, live session identity,
-shared Beads claim, local commit, and reviewed trial implementation have been
-proven. The remaining gate is a refreshed session launched with the shared
-Luna/high and Auto-review policy, followed by a bounded cycle showing that
-eligible command approvals do not interrupt Aaron. A Beads mail provider is
-optional and does not block readiness.
+Nadia is **ready**. Her home, worktree, live session identity, shared Beads
+claim, local commit, reviewed trial implementation, and refreshed Luna/high
+Auto-review cycle have been proven. The validation cycle exercised shared Beads
+mutation and local Git metadata without surfacing a command approval to Aaron.
+A Beads mail provider remains optional and unconfigured.

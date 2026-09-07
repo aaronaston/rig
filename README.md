@@ -41,8 +41,8 @@ Fleet members inherit [`fleet/session-defaults.toml`](fleet/session-defaults.tom
 
 `bd mail` is not itself a mailbox: it delegates to a configured external provider. No provider is configured yet, so Nadia's mailbox address is reserved but not operational. Until delivery is proven, use Beads comments and notes for handoff.
 
-Mail is optional notification infrastructure, not an onboarding gate. Nadia can
-become ready after her worktree, identity, shared Beads access, and reviewed
-trial assignment are proven.
+Mail is optional notification infrastructure, not an onboarding gate. Nadia is
+ready: her worktree, identity, shared Beads access, reviewed implementation
+trial, and refreshed Luna/high Auto-review validation cycle are proven.
 
 Project knowledge starts at [`knowledgebase/wiki/index.md`](knowledgebase/wiki/index.md). Work is tracked in Beads.
