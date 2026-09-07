@@ -23,6 +23,12 @@ task queue.
 - Run `bd ready`, then `bd show <id>` before starting assigned work.
 - Create a Beads issue before implementation when no suitable issue exists.
 - Claim work with `bd update <id> --claim`.
+- After claiming and before the first edit, synchronize the owned branch from
+  the current integration branch. Verify the worktree is clean and prior work
+  is resolved first. In this local-only repository, a fleet member runs
+  `git -C worktree merge --ff-only main` from their durable home. Do not update
+  idle branches speculatively. If fast-forward is impossible, stop and return
+  the divergence to MD without forcing, rebasing, or discarding.
 - Use inline `bd update` flags; do not use interactive `bd edit`.
 - Keep discovered follow-up work, dependencies, and blockers in Beads rather
   than Markdown TODO lists.
@@ -30,7 +36,8 @@ task queue.
   acceptance criteria and relevant validation have been satisfied.
 - Before ending an implementation session, close completed issues, run the
   relevant quality gates, and report changed files, validation, issue status,
-  and any remaining publication or synchronization step.
+  whether `main` advanced during implementation, and any remaining publication
+  or synchronization step.
 
 ## Useful Commands
 

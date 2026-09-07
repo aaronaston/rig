@@ -137,3 +137,7 @@ Aaron interrupted and rejected an attempted fast-forward of Nadia's idle branch.
 ## [2026-09-07] lint | Task-start Git synchronization
 
 Checked all relative links across twenty-two Markdown files under `knowledgebase/wiki/`: zero broken links. Reconciled root, MD, fleet, Nadia, lifecycle, overview, source, and decision documentation. Confirmed the interrupted command left Nadia's idle branch unchanged at `274e794`.
+
+## [2026-09-07] implementation | Task-start gate in Beads context
+
+Added the synchronization gate to `.beads/PRIME.md` so `bd prime` refreshes it inside persistent sessions as well as new sessions. The sequence is claim, clean-state check, local fast-forward, then first edit; handoff reports whether `main` advanced during implementation.
