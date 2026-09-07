@@ -141,3 +141,11 @@ Checked all relative links across twenty-two Markdown files under `knowledgebase
 ## [2026-09-07] implementation | Task-start gate in Beads context
 
 Added the synchronization gate to `.beads/PRIME.md` so `bd prime` refreshes it inside persistent sessions as well as new sessions. The sequence is claim, clean-state check, local fast-forward, then first edit; handoff reports whether `main` advanced during implementation.
+
+## [2026-09-07] documentation | Rig restart quickstart
+
+Added a root quickstart for completing agent handoffs, stopping only `rig-md` and `rig-fleet-*` tmux sessions, fully exiting the old Emacs process, restarting through `bin/rig-emacs`, opening Nadia from the Rig Roster, and recovering from common startup problems.
+
+## [2026-09-07] lint | Rig restart quickstart
+
+Syntax-checked the read-only listing and targeted tmux shutdown snippets without executing them. Checked the quickstart plus all twenty-two knowledgebase Markdown files: zero broken relative links. Confirmed `bin/rig-emacs` loads `emacs/rig.el` and invokes `rig-start`, which opens MD and the Rig Roster.

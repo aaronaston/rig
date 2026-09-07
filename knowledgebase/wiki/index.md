@@ -32,6 +32,7 @@ Start with the [overview](overview.md). Maintenance history is in the [log](log.
 
 - [Minimal control center](syntheses/minimal-control-center.md): proposed seat/session model and first-cycle walkthrough.
 - [Rig README](../../README.md): current startup and interaction instructions.
+- [Rig restart quickstart](../../quickstart.md): targeted session shutdown and Emacs restart with the roster sidebar.
 
 ## Seats
 

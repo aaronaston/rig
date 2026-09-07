@@ -2,6 +2,9 @@
 
 Rig is a small Emacs control center for a management seat and persistent implementation fleet. Aaron directs Managing Director (MD); MD records requirements in Beads, delegates implementation, and validates fleet output.
 
+For a complete shutdown and restart with the Rig Roster sidebar, follow the
+[restart quickstart](quickstart.md).
+
 ## Open MD
 
 From this repository root:
