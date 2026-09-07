@@ -17,6 +17,22 @@ Rig explicitly authorizes its seats and fleet members to use local Git for assig
 - Remote pushes, force-pushes, remote configuration changes, and Dolt remote synchronization require separate direction from Aaron or MD. Local Git authority does not imply remote publication authority.
 - A higher-level sandbox or orchestrator restriction can still prevent Git writes. If it does, report that external restriction precisely; do not reinterpret it as repository policy.
 
+## Task-Start Git Synchronization
+
+Synchronize when an identity starts a newly accepted task, not while its branch
+is idle and not merely because a session starts or reconnects. After claiming
+the Bead and before editing, verify the owned worktree is clean and prior work
+is resolved, then update the owned branch from the current integration branch.
+
+This repository currently has no Git remote, so a fleet member working from
+their durable home uses `git -C worktree merge --ff-only main`; this is not a
+`git pull`. If the fast-forward is impossible or unique prior work remains,
+stop and return the conflict to MD without forcing, rebasing, or discarding.
+At handoff, report whether `main` advanced during implementation. MD decides
+how any resulting divergence is integrated. Seats follow the same clean-state
+and current-base principle on their owned branch, subject to configured remotes
+and the remote-operation authority above.
+
 This project uses **bd** (beads) for issue tracking. Run `bd prime` for full workflow context.
 
 > **Architecture in one line:** Issues live in a local Dolt database

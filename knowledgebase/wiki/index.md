@@ -14,6 +14,7 @@ Start with the [overview](overview.md). Maintenance history is in the [log](log.
 - [Operator Git authority](sources/operator-git-authority.md): direct authorization for seats and fleet members to modify local Git state.
 - [Operator Rig Roster and fleet-pull direction](sources/operator-roster-and-pull-direction.md): accepted roster name/startup behavior, pull-based work, Nadia trial, and optional-mail boundary.
 - [Operator runtime policy](sources/operator-runtime-policy.md): Auto-review plus Sol/high for MD and Luna/high for fleet implementation.
+- [Operator task-start Git direction](sources/operator-task-start-git-sync.md): synchronize after accepting new work, not while an identity is idle.
 
 ## Decisions
 
@@ -25,6 +26,7 @@ Start with the [overview](overview.md). Maintenance history is in the [log](log.
 - [MD delegation and fleet](decisions/md-delegation-and-fleet.md): operator/MD authority, implementation delegation, and Nadia's selection.
 - [Fleet member lifecycle](decisions/fleet-member-lifecycle.md): onboarding, cross-boarding, off-boarding, pull/review handoff, and optional notification mail.
 - [Local Git authority](decisions/git-authority.md): scoped local Git rights for seats, MD, and fleet members; remote authority remains separate.
+- [Task-start Git synchronization](decisions/task-start-git-synchronization.md): clean-state and current-base gate after claim and before edits.
 
 ## Syntheses
 

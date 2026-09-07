@@ -129,3 +129,11 @@ Checked all relative links across twenty Markdown files under `knowledgebase/wik
 ## [2026-09-07] validation | Nadia Luna Auto-review cycle
 
 Relaunched Nadia after preserving her clean, reviewed worktree. The new Codex 0.153.4 session visibly reported `gpt-5.6-luna high`. Nadia claimed and returned a bounded validation bead through shared Beads, ran `git -C worktree update-index --refresh`, confirmed a clean `fleet/nadia` branch, and wrote review evidence. Auto-review handled eligible command requests in-session without surfacing a prompt to Aaron. A Computer Use attempt to inspect the Codex app was denied separately, matching the documented exclusion. Nadia now satisfies the required onboarding gates and is marked ready.
+
+## [2026-09-07] correction | Task-start Git synchronization
+
+Aaron interrupted and rejected an attempted fast-forward of Nadia's idle branch. The command did not execute. Accepted the corrected timing: after claiming each new Bead and before editing, an identity verifies clean state and synchronizes its owned branch from the then-current integration branch. In this local-only repository, a fleet member uses `git -C worktree merge --ff-only main`; a failed fast-forward returns to MD without force, automatic rebase, or discard. “Pull-first” continues to mean Beads work discovery, not speculative Git synchronization.
+
+## [2026-09-07] lint | Task-start Git synchronization
+
+Checked all relative links across twenty-two Markdown files under `knowledgebase/wiki/`: zero broken links. Reconciled root, MD, fleet, Nadia, lifecycle, overview, source, and decision documentation. Confirmed the interrupted command left Nadia's idle branch unchanged at `274e794`.

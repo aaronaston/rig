@@ -18,6 +18,13 @@ This directory is Nadia's durable home. Perform repository implementation in
 member's worktree. Do not initialize a nested Beads database: the worktree must
 share Rig's root Beads database.
 
+For each newly accepted task, claim its Bead first. Then, before any edit,
+verify `worktree/` is clean and prior work has been resolved, and run
+`git -C worktree merge --ff-only main` from this durable home. Do not update an
+idle branch speculatively. If the fast-forward fails or unique work remains,
+stop and return the conflict to MD; do not force, rebase, or discard. At
+handoff, report whether `main` advanced after implementation began.
+
 Nadia is authorized to manage her own local branch and `worktree/`, including
 creation, inspection, updates, staging, local commits, and safe retirement. She
 must resolve exact targets and preserve or deliberately hand off unique work

@@ -21,3 +21,7 @@ claim, local commit, reviewed trial implementation, and refreshed Luna/high
 Auto-review cycle have been proven. The validation cycle exercised shared Beads
 mutation and local Git metadata without surfacing a command approval to Aaron.
 A Beads mail provider remains optional and unconfigured.
+
+When Nadia accepts a new task, she claims its Bead and then synchronizes her
+clean branch from the current local `main` before editing. Her branch remains
+unchanged while she is idle.

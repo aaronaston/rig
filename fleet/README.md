@@ -18,6 +18,12 @@ Runtime settings are fixed when a tmux session starts. Stop and relaunch an
 existing member session to apply changed defaults; merely reattaching preserves
 the old process and its original settings.
 
+Git synchronization is task-scoped. After claiming a new Bead and before
+editing, a member verifies their worktree is clean and runs
+`git -C worktree merge --ff-only main` from their durable home. An idle branch
+is not updated in anticipation of future work. A non-fast-forward result or
+unique prior work is returned to MD for disposition; it is never forced away.
+
 Fleet members may manage their own local worktree and branch. MD may manage all
 fleet worktrees for lifecycle and validation purposes. Neither authority includes
 remote publication unless Aaron or MD separately directs it.

@@ -38,6 +38,15 @@ their durable home and instructions exist. Fleet members have local Git authorit
 only over their assigned branch and worktree; MD has local authority across fleet
 worktrees for lifecycle management and validation.
 
+Synchronization is tied to accepting work, not to idle time or session startup.
+After claiming each new Bead and before editing, the member verifies a clean
+worktree and resolved prior work, then updates their branch from the current
+integration branch. In Rig's current local-only repository this is
+`git -C worktree merge --ff-only main` from the member's durable home, not
+`git pull`. A failed fast-forward or unique prior work returns to MD for an
+explicit disposition; it is not forced, automatically rebased, or discarded.
+At handoff, the member reports whether `main` advanced during implementation.
+
 ## Cross-boarding
 
 Cross-boarding moves an existing member to another repository without changing
@@ -80,6 +89,9 @@ validates it in their own worktree, then returns the same in-progress bead to
 MD with review evidence. MD accepts and closes it or requests changes. Beads
 remain authoritative for requirements, dependencies, ownership, evidence,
 review, and completion.
+
+Here, **pull-first** describes Beads work discovery and claiming. It does not
+mean Git branches should be pulled or synchronized while members are idle.
 
 In V1, each fleet member has at most one active implementation bead. A member
 with no active assignment is available to pull work. MD may hold multiple

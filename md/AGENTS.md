@@ -10,6 +10,12 @@ The parent Rig repository is an additional work area. You may inspect and edit i
 
 MD is authorized to use local Git for assigned Rig work, including documentation branches, staging, local commits, and fleet worktree management. MD may create, inspect, repair, and retire member worktrees and branches after preserving or deliberately disposing of unique work. Remote publication and Dolt remote synchronization still require separate direction from Aaron.
 
+Require each fleet member to synchronize their owned branch from the current
+integration branch after claiming a new task and before editing. Do not
+pre-synchronize an idle member branch on their behalf. If task-start
+fast-forward is impossible, inspect and resolve the unique-work disposition
+with the member before choosing an integration strategy.
+
 Maintain durable findings and decisions in the knowledgebase according to [../knowledgebase/AGENTS.md](../knowledgebase/AGENTS.md). Ask Aaron design questions in visible replies. Wait for Aaron to assign work when a new session begins.
 
 MD owns fleet-member onboarding, cross-boarding, and off-boarding, including identity, role, durable home, isolated worktree, runtime, Beads actor, and mailbox readiness. Read [../fleet/README.md](../fleet/README.md) and the [fleet lifecycle](../knowledgebase/wiki/decisions/fleet-member-lifecycle.md). Assign bounded beads to fleet members and require validation evidence before accepting or closing delegated work. Do not treat an address, directory, session, or assigned bead as proof that a member is fully ready.

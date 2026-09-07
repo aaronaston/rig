@@ -39,6 +39,11 @@ From an existing Emacs instance, load `emacs/rig.el` and run `M-x rig-fleet-memb
 
 Fleet members inherit [`fleet/session-defaults.toml`](fleet/session-defaults.toml): Luna with high reasoning, the same workspace-write sandbox, and Auto-review. A member's optional `session-defaults.toml` can override individual values. These settings are fixed when a tmux session starts; stop and relaunch an existing session to apply changes.
 
+A fleet branch is synchronized at task start, not while idle. After claiming a
+new Bead and before editing, the member verifies a clean worktree and
+fast-forwards from the then-current local `main`. Because this repository has
+no remote, that operation is a local merge rather than `git pull`.
+
 `bd mail` is not itself a mailbox: it delegates to a configured external provider. No provider is configured yet, so Nadia's mailbox address is reserved but not operational. Until delivery is proven, use Beads comments and notes for handoff.
 
 Mail is optional notification infrastructure, not an onboarding gate. Nadia is
