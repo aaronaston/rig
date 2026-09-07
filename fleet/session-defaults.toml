@@ -1,0 +1,10 @@
+schema_version = 1
+
+# These replaceable runtime defaults apply to every fleet member. A member may
+# override individual quoted values in fleet/<member>/session-defaults.toml.
+runner = "codex-cli"
+model = "gpt-5.6-luna"
+reasoning_effort = "high"
+sandbox_mode = "workspace-write"
+approval_policy = "on-request"
+approvals_reviewer = "auto_review"

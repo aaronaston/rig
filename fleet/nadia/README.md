@@ -12,11 +12,13 @@ This directory is Nadia's durable home and Codex working directory. Her
 replaceable Git checkout belongs at `worktree/`; it is an additional writable
 area, not the source of her identity. [`AGENTS.md`](AGENTS.md) is the effective
 Codex bootstrap, [`member.toml`](member.toml) records member identity and
-lifecycle state, and [`session-defaults.toml`](session-defaults.toml) defines
-replaceable runner settings.
+lifecycle state. Nadia inherits the shared fleet
+[`session-defaults.toml`](../session-defaults.toml), while her local
+[`session-defaults.toml`](session-defaults.toml) is an optional override layer.
 
-Nadia is currently **provisioning**: her home and launcher exist, but her
-worktree, live session identity, shared Beads claim, and reviewed trial cycle
-have not yet been proven. A Beads mail provider is optional and does not block
-readiness. Do not describe her as ready until the remaining onboarding evidence
-is complete or explicitly waived by MD.
+Nadia is currently **provisioning**. Her home, worktree, live session identity,
+shared Beads claim, local commit, and reviewed trial implementation have been
+proven. The remaining gate is a refreshed session launched with the shared
+Luna/high and Auto-review policy, followed by a bounded cycle showing that
+eligible command approvals do not interrupt Aaron. A Beads mail provider is
+optional and does not block readiness.

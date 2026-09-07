@@ -22,6 +22,13 @@ instructions. MD then releases a bounded trial bead for the member to claim and
 validates the returned evidence. A mailbox may be provisioned and tested later
 when Rig has a concrete asynchronous-notification requirement.
 
+Fleet members normally inherit the shared fleet runtime policy rather than
+copying it into each home: Codex CLI on Luna/high, workspace-write, and
+Auto-review. A member-specific session file is an optional override. MD remains
+on Sol/high for requirements, design, orchestration, and validation. Runtime
+settings are launch-time state, so an already-running tmux session must be
+stopped and relaunched before changed defaults can be validated.
+
 Onboarding evidence states are `provisioning`, `ready`, or `blocked`. The
 member record must not move to `ready` until required gates have direct
 evidence or MD explicitly records a waiver.

@@ -238,6 +238,80 @@
         (should (eq (selected-window) md-window))
         (should (window-live-p roster-window))))))
 
+(ert-deftest rig-md-command-uses-sol-high-and-auto-review ()
+  (rig-test--with-temp-root
+    (rig-test--write-file
+     root "md/session-defaults.toml"
+     (concat "runner = \"codex-cli\"\n"
+             "model = \"gpt-5.6-sol\"\n"
+             "reasoning_effort = \"high\"\n"
+             "sandbox_mode = \"workspace-write\"\n"
+             "approval_policy = \"on-request\"\n"
+             "approvals_reviewer = \"auto_review\"\n"))
+    (cl-letf (((symbol-function 'rig--required-executable)
+               (lambda (name) (concat "/test/bin/" name))))
+      (should
+       (equal
+        (rig--command-for-seat "md")
+        (list "/test/bin/codex"
+              "--model" "gpt-5.6-sol"
+              "--config" "model_reasoning_effort=high"
+              "--sandbox" "workspace-write"
+              "--ask-for-approval" "on-request"
+              "--config" "approvals_reviewer=auto_review"
+              "--cd" (directory-file-name (expand-file-name "md" root))
+              "--add-dir" (directory-file-name root)))))))
+
+(ert-deftest rig-fleet-command-inherits-luna-high-and-auto-review ()
+  (rig-test--with-temp-root
+    (rig-test--write-file
+     root "fleet/session-defaults.toml"
+     (concat "runner = \"codex-cli\"\n"
+             "model = \"gpt-5.6-luna\"\n"
+             "reasoning_effort = \"high\"\n"
+             "sandbox_mode = \"workspace-write\"\n"
+             "approval_policy = \"on-request\"\n"
+             "approvals_reviewer = \"auto_review\"\n"))
+    (rig-test--write-file
+     root "fleet/nadia/member.toml"
+     (concat "beads_actor = \"Nadia\"\n"
+             "worktree = \"worktree\"\n"))
+    (cl-letf (((symbol-function 'rig--required-executable)
+               (lambda (name) (concat "/test/bin/" name))))
+      (should
+       (equal
+        (rig--command-for-seat "fleet/nadia")
+        (list "/test/bin/codex"
+              "--model" "gpt-5.6-luna"
+              "--config" "model_reasoning_effort=high"
+              "--sandbox" "workspace-write"
+              "--ask-for-approval" "on-request"
+              "--config" "approvals_reviewer=auto_review"
+              "--cd" (directory-file-name
+                        (expand-file-name "fleet/nadia" root))
+              "--add-dir" (directory-file-name
+                             (expand-file-name
+                              "fleet/nadia/worktree" root))))))))
+
+(ert-deftest rig-fleet-member-may-override-shared-session-defaults ()
+  (rig-test--with-temp-root
+    (rig-test--write-file
+     root "fleet/session-defaults.toml"
+     (concat "runner = \"codex-cli\"\n"
+             "model = \"gpt-5.6-luna\"\n"
+             "reasoning_effort = \"high\"\n"
+             "sandbox_mode = \"workspace-write\"\n"
+             "approval_policy = \"on-request\"\n"
+             "approvals_reviewer = \"auto_review\"\n"))
+    (rig-test--write-file
+     root "fleet/nadia/session-defaults.toml"
+     "model = \"gpt-5.6-sol\"\n")
+    (cl-letf (((symbol-function 'rig--required-executable)
+               (lambda (name) (concat "/test/bin/" name))))
+      (should
+       (equal (plist-get (rig--read-session-config "fleet/nadia") :model)
+              "gpt-5.6-sol")))))
+
 (provide 'rig-tests)
 
 ;;; rig-tests.el ends here

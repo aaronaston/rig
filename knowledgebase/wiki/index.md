@@ -13,11 +13,13 @@ Start with the [overview](overview.md). Maintenance history is in the [log](log.
 - [Gas Town mail](sources/gastown-mail.md): persistent mailbox commands, town-level Beads storage, and the provider boundary behind `bd mail`.
 - [Operator Git authority](sources/operator-git-authority.md): direct authorization for seats and fleet members to modify local Git state.
 - [Operator Rig Roster and fleet-pull direction](sources/operator-roster-and-pull-direction.md): accepted roster name/startup behavior, pull-based work, Nadia trial, and optional-mail boundary.
+- [Operator runtime policy](sources/operator-runtime-policy.md): Auto-review plus Sol/high for MD and Luna/high for fleet implementation.
 
 ## Decisions
 
 - [Initial scope](decisions/initial-scope.md): confirmed requirements, including MD's they/them pronoun preference, and unresolved choices.
-- [MD session defaults](decisions/session-defaults.md): Codex CLI with Sol on high, modeled as replaceable session properties.
+- [Role-based session defaults](decisions/session-defaults.md): Sol/high for MD and inherited Luna/high for fleet, modeled as replaceable session properties.
+- [Agent approval policy](decisions/agent-approval-policy.md): workspace-write with on-request Auto-review and explicit limits.
 - [MD session lifecycle](decisions/session-lifecycle.md): Emacs attachment, tmux persistence, and deliberate session exit.
 - [Seat home and work area](decisions/seat-home.md): `md/` as working directory with the parent repository available for shared work.
 - [MD delegation and fleet](decisions/md-delegation-and-fleet.md): operator/MD authority, implementation delegation, and Nadia's selection.

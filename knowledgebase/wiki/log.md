@@ -113,3 +113,15 @@ Accepted declarative seat/member manifests, action-triggered and ten-second visi
 ## [2026-09-07] lint | Final Rig Roster requirements
 
 Checked all relative links under `knowledgebase/wiki/` after finalizing and releasing the feature: zero broken links. Confirmed Nadia's filtered ready-work query returns only the Rig Roster bead without claiming it.
+
+## [2026-09-07] ingest | Operator runtime policy
+
+Recorded Aaron's accepted non-interactive approval and role-based model requirements. MD remains on Sol/high for requirements, design, orchestration, and validation; fleet implementation inherits Luna/high. Both roles use the workspace-write sandbox with on-request Auto-review for eligible approval requests.
+
+## [2026-09-07] decision | Role-based runtime defaults and Auto-review
+
+Added shared fleet defaults with optional per-member overrides and extended the launcher to emit explicit sandbox, approval-policy, and reviewer arguments. Existing tmux sessions retain their original launch configuration and require a stop/relaunch before the new policy can be validated. Repeated Auto-review denials and Computer Use app confirmations remain documented interaction boundaries.
+
+## [2026-09-07] lint | Runtime policy update
+
+Checked all relative links across twenty Markdown files under `knowledgebase/wiki/` after adding the runtime source and decisions: zero broken links. Reconciled the root, MD, fleet, and Nadia documentation with the shared fleet defaults and launch-time restart boundary.

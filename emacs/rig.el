@@ -106,12 +106,22 @@ intentionally not a general TOML parser."
       config)))
 
 (defun rig--read-session-config (seat)
-  "Read and merge Rig's session and optional member configuration for SEAT."
+  "Read and merge Rig's session and optional member configuration for SEAT.
+
+Fleet members inherit the shared fleet session defaults.  A member-specific
+session-defaults.toml is optional and takes precedence when present."
   (let* ((seat-directory (rig--seat-directory seat))
          (session-file (expand-file-name "session-defaults.toml" seat-directory))
-         (member-file (expand-file-name "member.toml" seat-directory)))
-    (append (rig--read-string-config-file session-file t)
-            (rig--read-string-config-file member-file))))
+         (member-file (expand-file-name "member.toml" seat-directory))
+         (fleet-member-p (string-prefix-p "fleet/" seat))
+         (fleet-defaults-file
+          (expand-file-name "fleet/session-defaults.toml" rig-root)))
+    (if fleet-member-p
+        (append (rig--read-string-config-file session-file)
+                (rig--read-string-config-file fleet-defaults-file t)
+                (rig--read-string-config-file member-file))
+      (append (rig--read-string-config-file session-file t)
+              (rig--read-string-config-file member-file)))))
 
 (defun rig--identity-from-manifest (file kind)
   "Return a Rig identity read from manifest FILE of KIND."
@@ -448,14 +458,22 @@ Return :unavailable when Beads cannot be queried."
   "Translate runner-neutral CONFIG into a Codex CLI command for SEAT."
   (let ((model (plist-get config :model))
         (effort (plist-get config :reasoning_effort))
+        (sandbox (plist-get config :sandbox_mode))
+        (approval-policy (plist-get config :approval_policy))
+        (approvals-reviewer (plist-get config :approvals_reviewer))
         (seat-directory (rig--seat-directory seat))
         command)
-    (unless (and model effort)
-      (user-error "Codex sessions require model and reasoning_effort"))
+    (unless (and model effort sandbox approval-policy approvals-reviewer)
+      (user-error
+       (concat "Codex sessions require model, reasoning_effort, sandbox_mode, "
+               "approval_policy, and approvals_reviewer")))
     (setq command
           (list (rig--required-executable "codex")
                 "--model" model
                 "--config" (format "model_reasoning_effort=%s" effort)
+                "--sandbox" sandbox
+                "--ask-for-approval" approval-policy
+                "--config" (format "approvals_reviewer=%s" approvals-reviewer)
                 "--cd" (directory-file-name seat-directory)))
     (dolist (directory (rig--work-area-directories seat config) command)
       (setq command

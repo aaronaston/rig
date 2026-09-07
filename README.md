@@ -10,7 +10,7 @@ From this repository root:
 ./bin/rig-emacs
 ```
 
-Emacs opens the `*rig-md*` buffer. A new MD session starts Codex CLI with the defaults in [`md/session-defaults.toml`](md/session-defaults.toml) and waits for you at the input prompt. Its working directory is `md/`, and [`md/AGENTS.md`](md/AGENTS.md) supplies seat-specific instructions. The parent Rig repository is also available as a work area. If MD is already running, Emacs reconnects to that session. Type in the buffer to talk to it.
+Emacs opens the `*rig-md*` buffer. A new MD session starts Codex CLI with the defaults in [`md/session-defaults.toml`](md/session-defaults.toml): Sol with high reasoning, a workspace-write sandbox, and Auto-review for eligible approval requests. Its working directory is `md/`, and [`md/AGENTS.md`](md/AGENTS.md) supplies seat-specific instructions. The parent Rig repository is also available as a work area. If MD is already running, Emacs reconnects to that session. Type in the buffer to talk to it.
 
 Rig displays Codex through Emacs `vterm`, attached to the persistent tmux session. `vterm` supports the cursor movement and alternate-screen behavior that Codex uses to redraw live status. Install the Emacs dependency once with `./bin/rig-install-emacs-deps`; building it requires CMake and GNU libtool.
 
@@ -36,6 +36,8 @@ Then launch Nadia in a new Emacs instance:
 ```
 
 From an existing Emacs instance, load `emacs/rig.el` and run `M-x rig-fleet-member`. Fleet sessions use tmux names and buffers derived from the member slug; Nadia uses `rig-fleet-nadia` and `*rig-fleet-nadia*`. `M-x rig-fleet-member-status` and `M-x rig-fleet-member-detach` accept the same slug. Fleet sessions inherit a distinct `BEADS_ACTOR` from the member record.
+
+Fleet members inherit [`fleet/session-defaults.toml`](fleet/session-defaults.toml): Luna with high reasoning, the same workspace-write sandbox, and Auto-review. A member's optional `session-defaults.toml` can override individual values. These settings are fixed when a tmux session starts; stop and relaunch an existing session to apply changes.
 
 `bd mail` is not itself a mailbox: it delegates to a configured external provider. No provider is configured yet, so Nadia's mailbox address is reserved but not operational. Until delivery is proven, use Beads comments and notes for handoff.
 
