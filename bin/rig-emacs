@@ -6,4 +6,4 @@ rig_emacs_bin=${RIG_EMACS_BIN:-emacs}
 
 exec "$rig_emacs_bin" \
   --load "$rig_root/emacs/rig.el" \
-  --funcall rig-md
+  --funcall rig-start

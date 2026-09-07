@@ -1,10 +1,12 @@
 ;;; rig.el --- Emacs console for Rig sessions -*- lexical-binding: t; -*-
 
-;; Rig keeps seat identity separate from the agent client and model used by a
-;; particular session.  This first version exposes one seat: MD.
+;; Rig keeps seat and fleet identity separate from the agent client and model
+;; used by a particular session.
 
 (require 'subr-x)
 (require 'term)
+(require 'json)
+(require 'seq)
 
 ;; Declared by vterm when that optional package is loaded.  Declare them here
 ;; so lexical byte compilation preserves the intended dynamic bindings.
@@ -29,6 +31,11 @@
 (defconst rig--md-seat "md")
 (defconst rig--md-tmux-session "rig-md")
 (defconst rig--md-buffer-name "*rig-md*")
+(defconst rig--roster-buffer-name "*Rig Roster*")
+(defconst rig--roster-refresh-seconds 10)
+
+(defvar rig--roster-refresh-timer nil
+  "Timer used to refresh the Rig Roster while it is visible.")
 
 (defvar-local rig--terminal-session-label nil
   "Human-readable label for the Rig session in the current terminal buffer.")
@@ -44,6 +51,7 @@
     (define-key map (kbd "C-c C-j") #'rig-terminal-emacs-mode)
     (define-key map (kbd "C-c C-k") #'rig-terminal-codex-mode)
     (define-key map (kbd "C-c d") #'rig-session-detach)
+    (define-key map (kbd "C-c r") #'rig-roster)
     map)
   "Keys Rig reserves before a terminal process can receive them.")
 
@@ -104,6 +112,321 @@ intentionally not a general TOML parser."
          (member-file (expand-file-name "member.toml" seat-directory)))
     (append (rig--read-string-config-file session-file t)
             (rig--read-string-config-file member-file))))
+
+(defun rig--identity-from-manifest (file kind)
+  "Return a Rig identity read from manifest FILE of KIND."
+  (let* ((config (rig--read-string-config-file file t))
+         (home (file-name-directory file))
+         (slug (or (plist-get config :slug)
+                   (file-name-nondirectory (directory-file-name home))))
+         (seat (if (eq kind 'fleet) (format "fleet/%s" slug) slug))
+         (name (or (plist-get config :name) (capitalize slug)))
+         (actor (or (plist-get config :beads_actor) name)))
+    (list :kind kind
+          :slug slug
+          :seat seat
+          :name name
+          :actor actor
+          :lifecycle (plist-get config :status)
+          :home home
+          :worktree (plist-get config :worktree)
+          :tmux (or (plist-get config :tmux_session)
+                    (if (eq kind 'fleet)
+                        (rig--fleet-tmux-session slug)
+                      (format "rig-%s" slug)))
+          :buffer (or (plist-get config :buffer_name)
+                      (if (eq kind 'fleet)
+                          (rig--fleet-buffer-name slug)
+                        (format "*rig-%s*" slug))))))
+
+(defun rig--discover-identities ()
+  "Discover declared Rig seats and fleet members from their manifests."
+  (let ((seat-files
+         (file-expand-wildcards (expand-file-name "*/seat.toml" rig-root)))
+        (fleet-files
+         (file-expand-wildcards
+          (expand-file-name "fleet/*/member.toml" rig-root))))
+    (list
+     (sort (mapcar (lambda (file)
+                     (rig--identity-from-manifest file 'seat))
+                   seat-files)
+           (lambda (a b) (string-lessp (plist-get a :name)
+                                        (plist-get b :name))))
+     (sort (mapcar (lambda (file)
+                     (rig--identity-from-manifest file 'fleet))
+                   fleet-files)
+           (lambda (a b) (string-lessp (plist-get a :name)
+                                        (plist-get b :name)))))))
+
+(defun rig--beads-issues (actor)
+  "Return open and in-progress Beads issues assigned to ACTOR.
+
+Return :unavailable when Beads cannot be queried."
+  (condition-case nil
+      (with-temp-buffer
+        (let ((status
+               (process-file
+                (rig--required-executable "bd") nil t nil
+                "-C" (directory-file-name rig-root)
+                "list" "--assignee" actor
+                "--status" "open,in_progress" "--json")))
+          (if (not (eq status 0))
+              :unavailable
+            (goto-char (point-min))
+            (let ((json-array-type 'list)
+                  (json-object-type 'alist)
+                  (json-key-type 'symbol)
+                  (json-false nil)
+                  (json-null nil))
+              (json-read)))))
+    (error :unavailable)))
+
+(defun rig--issue-needs-review-p (issue)
+  "Return non-nil when ISSUE has the needs-review label."
+  (member "needs-review" (alist-get 'labels issue)))
+
+(defun rig--issue-newer-p (a b)
+  "Order issues A and B for the roster task summary."
+  (let ((a-review (rig--issue-needs-review-p a))
+        (b-review (rig--issue-needs-review-p b)))
+    (if (eq (not (null a-review)) (not (null b-review)))
+        (string> (or (alist-get 'updated_at a) "")
+                 (or (alist-get 'updated_at b) ""))
+      a-review)))
+
+(defun rig--task-summary (issues)
+  "Return the accepted short task summary for ISSUES."
+  (cond
+   ((eq issues :unavailable) "tasks unavailable")
+   ((null issues) "no active task")
+   (t
+    (let* ((ordered (sort (copy-sequence issues) #'rig--issue-newer-p))
+           (title (or (alist-get 'title (car ordered)) "untitled task"))
+           (additional (1- (length ordered))))
+      (if (> additional 0)
+          (format "%s +%d" title additional)
+        title)))))
+
+(defun rig--identity-state (identity)
+  "Add observable session and work state to IDENTITY."
+  (let* ((issues (rig--beads-issues (plist-get identity :actor)))
+         (work-state (cond
+                      ((eq issues :unavailable) "work unknown")
+                      ((null issues) "idle")
+                      (t "assigned"))))
+    (append identity
+            (list :session (if (rig--tmux-session-live-p
+                                (plist-get identity :tmux))
+                               "running"
+                             "stopped")
+                  :work-state work-state
+                  :task-summary (rig--task-summary issues)))))
+
+(defun rig--roster-window-width (&optional frame)
+  "Return the bounded roster width for FRAME."
+  (max 24 (min 40 (round (* 0.2 (frame-width frame))))))
+
+(defvar rig-roster-mode-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map special-mode-map)
+    (define-key map (kbd "g") #'rig-roster-refresh)
+    (define-key map (kbd "RET") #'rig-roster-activate)
+    map)
+  "Keymap for Rig Roster buffers.")
+
+(define-derived-mode rig-roster-mode special-mode "Rig-Roster"
+  "Read-only view of declared Rig identities and observable state."
+  (setq-local truncate-lines t))
+
+(defun rig--roster-entry-at-point ()
+  "Return the roster identity at point, if any."
+  (get-text-property (point) 'rig-identity))
+
+(defun rig--truncate-task-summary (summary width prefix)
+  "Fit SUMMARY after PREFIX within WIDTH, preserving a trailing +N count."
+  (let ((available (max 1 (- width (string-width prefix)))))
+    (if (string-match "\\(.*\\)\\( [+][0-9]+\\)$" summary)
+        (let* ((title (match-string 1 summary))
+               (suffix (match-string 2 summary))
+               (title-width (max 1 (- available (string-width suffix)))))
+          (concat
+           (truncate-string-to-width title title-width nil nil "…")
+           suffix))
+      (truncate-string-to-width summary available nil nil "…"))))
+
+(defun rig--insert-roster-section (title identities width)
+  "Insert roster section TITLE with IDENTITIES truncated to WIDTH."
+  (insert (propertize title 'face 'bold) "\n")
+  (if (null identities)
+      (insert "  None\n")
+    (dolist (identity identities)
+      (let* ((state (rig--identity-state identity))
+             (lifecycle (plist-get state :lifecycle))
+             (session-parts
+              (delq nil (list lifecycle (plist-get state :session))))
+             (work-state (plist-get state :work-state))
+             (task-prefix (format "%s: " work-state))
+             (task-line
+              (concat task-prefix
+                      (rig--truncate-task-summary
+                       (plist-get state :task-summary)
+                       width task-prefix)))
+             (start (point)))
+        (insert
+         (truncate-string-to-width
+          (format "  %s" (plist-get state :name)) width nil nil "…")
+         "\n"
+         (truncate-string-to-width
+          (string-join session-parts " | ")
+          width nil nil "…")
+         "\n"
+         task-line
+         "\n")
+        (add-text-properties
+         start (point)
+         (list 'rig-identity identity
+               'mouse-face 'highlight
+               'help-echo "RET: start or attach this Rig identity")))))
+  (insert "\n"))
+
+(defun rig-roster-refresh ()
+  "Refresh the Rig Roster immediately from manifests and live state."
+  (interactive)
+  (let* ((buffer (get-buffer-create rig--roster-buffer-name))
+         (identity (and (eq (current-buffer) buffer)
+                        (rig--roster-entry-at-point)))
+         (identity-key (and identity
+                            (cons (plist-get identity :kind)
+                                  (plist-get identity :slug))))
+         (groups (rig--discover-identities))
+         ;; The side-window separator and terminal truncation glyph consume
+         ;; two columns of the total width.
+         (width (max 1 (- (rig--roster-window-width) 2))))
+    (with-current-buffer buffer
+      (unless (derived-mode-p 'rig-roster-mode)
+        (rig-roster-mode))
+      (let ((inhibit-read-only t))
+        (erase-buffer)
+        (insert (propertize "Rig Roster\n"
+                            'face '(:weight bold :height 1.1)))
+        (insert "g refresh  RET open\nC-x 0 close\n\n")
+        (rig--insert-roster-section "Seats" (car groups) width)
+        (rig--insert-roster-section "Fleet" (cadr groups) width)
+        (goto-char (point-min))
+        (when identity-key
+          (let (match)
+            (while (and (setq match
+                              (text-property-search-forward
+                               'rig-identity nil nil t))
+                        (not
+                         (let ((candidate
+                                (get-text-property
+                                 (prop-match-beginning match)
+                                 'rig-identity)))
+                           (and
+                            (eq (plist-get candidate :kind)
+                                (car identity-key))
+                            (equal (plist-get candidate :slug)
+                                   (cdr identity-key)))))))
+            (when match
+              (goto-char (prop-match-beginning match))))))
+      buffer)))
+
+(defun rig--roster-cancel-refresh ()
+  "Cancel the roster refresh timer."
+  (when (timerp rig--roster-refresh-timer)
+    (cancel-timer rig--roster-refresh-timer))
+  (setq rig--roster-refresh-timer nil))
+
+(defun rig--roster-refresh-if-visible ()
+  "Refresh the roster if visible, otherwise stop its timer."
+  (if (get-buffer-window rig--roster-buffer-name t)
+      (rig-roster-refresh)
+    (rig--roster-cancel-refresh)))
+
+(defun rig--roster-schedule-refresh ()
+  "Schedule ten-second roster refreshes while the roster is visible."
+  (rig--roster-cancel-refresh)
+  (setq rig--roster-refresh-timer
+        (run-with-timer rig--roster-refresh-seconds
+                        rig--roster-refresh-seconds
+                        #'rig--roster-refresh-if-visible)))
+
+(defun rig--resize-roster-window (window)
+  "Resize roster WINDOW to the accepted bounded width when possible."
+  (let ((delta (- (rig--roster-window-width (window-frame window))
+                  (window-total-width window))))
+    (unless (zerop delta)
+      (ignore-errors (window-resize window delta t t)))))
+
+;;;###autoload
+(defun rig-roster ()
+  "Open or focus the Rig Roster in a normal left-side window."
+  (interactive)
+  (let* ((buffer (rig-roster-refresh))
+         (window (or (get-buffer-window buffer t)
+                     (display-buffer-in-side-window
+                      buffer '((side . left)
+                               (slot . -1)
+                               (window-width . 0.2))))))
+    (rig--resize-roster-window window)
+    (rig--roster-schedule-refresh)
+    (select-window window)
+    (goto-char (point-min))
+    (let ((match (text-property-search-forward
+                  'rig-identity nil nil t)))
+      (when match
+        (goto-char (prop-match-beginning match))))
+    window))
+
+(defun rig--roster-main-window (roster-window)
+  "Return the largest non-side window other than ROSTER-WINDOW."
+  (car
+   (sort
+    (seq-filter
+     (lambda (window)
+       (and (not (eq window roster-window))
+            (not (window-minibuffer-p window))
+            (not (window-parameter window 'window-side))))
+     (window-list nil 'nomini))
+    (lambda (a b)
+      (> (* (window-total-width a) (window-total-height a))
+         (* (window-total-width b) (window-total-height b)))))))
+
+(defun rig--identity-provisioning-error (identity)
+  "Return a precise provisioning error for IDENTITY, or nil."
+  (when (equal (plist-get identity :lifecycle) "provisioning")
+    (let* ((worktree (plist-get identity :worktree))
+           (path (and worktree
+                      (expand-file-name worktree
+                                        (plist-get identity :home)))))
+      (if (and path (not (file-directory-p path)))
+          (format "%s is provisioning; missing worktree %s"
+                  (plist-get identity :name) path)
+        (format "%s is provisioning; MD has not marked onboarding complete"
+                (plist-get identity :name))))))
+
+(defun rig-roster-activate ()
+  "Start or attach the Rig identity on the current roster entry."
+  (interactive)
+  (let* ((identity (rig--roster-entry-at-point))
+         (roster-window (selected-window))
+         (error-message
+          (and identity (rig--identity-provisioning-error identity)))
+         (main-window (rig--roster-main-window roster-window)))
+    (unless identity
+      (user-error "No Rig identity on this line"))
+    (when error-message
+      (user-error "%s" error-message))
+    (unless (window-live-p main-window)
+      (user-error "Rig Roster needs a main window for the terminal"))
+    (select-window main-window)
+    (rig--open-session (plist-get identity :seat)
+                       (plist-get identity :tmux)
+                       (plist-get identity :buffer)
+                       (plist-get identity :name))
+    (rig-roster-refresh)
+    (rig--roster-schedule-refresh)))
 
 (defun rig--work-area-directories (seat config)
   "Return the writable project areas for SEAT described by CONFIG."
@@ -289,6 +612,16 @@ intentionally not a general TOML parser."
   From the MD terminal, invoke this directly with `C-c d'."
   (interactive)
   (rig--detach-buffer rig--md-buffer-name "MD"))
+
+;;;###autoload
+(defun rig-start ()
+  "Open MD and the Rig Roster, leaving the terminal in the main window."
+  (interactive)
+  (rig-md)
+  (let ((terminal-window (selected-window)))
+    (rig-roster)
+    (when (window-live-p terminal-window)
+      (select-window terminal-window))))
 
 (defun rig--fleet-seat (member)
   "Return the seat path for fleet MEMBER."
