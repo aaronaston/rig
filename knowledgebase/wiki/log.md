@@ -157,3 +157,18 @@ Recorded Aaron's correction that the Rig component is named Roster, clarified li
 ## [2026-09-08] lint | Roster clarification
 
 Checked all relative links across twenty-three Markdown files under `knowledgebase/wiki/`: zero broken links. Confirmed current user documentation and Emacs help/messages use Roster, while immutable source captures and historical log entries preserve superseded terminology.
+
+## [2026-09-08] fix | Deterministic Roster terminal placement
+
+Recorded and implemented the accepted rule that Roster activation reuses its
+exact ordinary main window despite ambient Emacs display rules. The protected
+path preserves the Roster, unrelated window topology, and the replaced MD
+buffer and live process; an unusable target raises a precise error instead of
+splitting. Bead `beads-tests-wfq` contains the implementation and validation
+evidence.
+
+## [2026-09-08] lint | Roster terminal placement
+
+Checked all relative links across twenty-three Markdown files under
+`knowledgebase/wiki/` after documenting deterministic Roster placement: zero
+broken links. Confirmed the existing Roster decision remains indexed.

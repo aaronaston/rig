@@ -25,5 +25,13 @@ Manual `g` refresh and refresh after an identity action remain immediate. This
 supersedes the original ten-second automatic interval, which Aaron observed
 briefly blocking Emacs input.
 
+Activating an identity from the Roster reuses the exact ordinary main window
+selected for that action. Ambient Emacs buffer-display rules must not redirect
+the terminal into a newly split or unrelated window. The Roster and unrelated
+window topology remain unchanged, and replacing an MD terminal view does not
+kill its buffer, process, or persistent tmux session. If the chosen target is
+no longer a live, replaceable ordinary window, Rig reports the specific problem
+instead of creating another window.
+
 Evidence: [operator direction](../sources/operator-roster-and-pull-direction.md)
-and Bead `beads-tests-4kh`.
+and Beads `beads-tests-4kh` and `beads-tests-wfq`.

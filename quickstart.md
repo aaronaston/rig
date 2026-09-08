@@ -79,8 +79,10 @@ The launcher should:
   state.
 
 Move to Nadia's roster entry and press `RET` to start her Luna/high Auto-review
-session in the main window. The Roster remains open. Starting Nadia should
-change `Tmux` to `running` and show `Attachment: attached` immediately.
+session in the existing main window. The Roster remains open, no extra window
+is created, and the replaced MD buffer and process remain alive for reopening.
+Starting Nadia should change `Tmux` to `running` and show `Attachment: attached`
+immediately.
 
 `Lifecycle: active` means the management seat is enabled. `Lifecycle: ready`
 means a fleet member passed onboarding and may accept work. Neither is a busy

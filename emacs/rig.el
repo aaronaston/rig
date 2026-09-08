@@ -454,7 +454,8 @@ Return :unavailable when Beads cannot be queried."
     (rig--open-session (plist-get identity :seat)
                        (plist-get identity :tmux)
                        (plist-get identity :buffer)
-                       (plist-get identity :name))
+                       (plist-get identity :name)
+                       main-window)
     (rig-roster-refresh)
     (rig--roster-schedule-refresh)))
 
@@ -596,12 +597,45 @@ or `unavailable' when tmux does not return valid metadata."
       (rig-terminal-codex-mode)))
    (t (user-error "This is not a Rig terminal buffer"))))
 
-(defun rig--attach-tmux-session (name buffer-name label directory)
-  "Attach NAME in BUFFER-NAME, identified as LABEL and rooted at DIRECTORY."
+(defun rig--require-terminal-target-window (window)
+  "Return WINDOW when it can safely display a Rig terminal.
+
+Raise a precise user error when WINDOW is no longer live or is not an ordinary,
+replaceable Emacs window."
+  (unless (window-live-p window)
+    (user-error "Cannot display Rig terminal: target window is no longer live"))
+  (when (window-minibuffer-p window)
+    (user-error "Cannot display Rig terminal: target window is a minibuffer"))
+  (when (window-parameter window 'window-side)
+    (user-error "Cannot display Rig terminal: target window is a side window"))
+  (when (window-dedicated-p window)
+    (user-error "Cannot display Rig terminal: target window is dedicated"))
+  window)
+
+(defun rig--show-terminal-buffer (buffer &optional target-window)
+  "Show BUFFER in TARGET-WINDOW, or use normal display policy when nil.
+
+An explicit target is authoritative: ambient `display-buffer-alist' rules may
+not redirect the terminal or create another window."
+  (if target-window
+      (let ((window (rig--require-terminal-target-window target-window)))
+        (set-window-buffer window buffer)
+        (select-window window)
+        buffer)
+    (pop-to-buffer buffer)))
+
+(defun rig--attach-tmux-session (name buffer-name label directory
+                                      &optional target-window)
+  "Attach NAME in BUFFER-NAME, identified as LABEL and rooted at DIRECTORY.
+
+When TARGET-WINDOW is non-nil, display the terminal in that exact window
+without consulting ambient display-buffer rules."
+  (when target-window
+    (rig--require-terminal-target-window target-window))
   (rig--ensure-terminal-backend)
   (let ((existing (get-buffer buffer-name)))
     (if (and existing (process-live-p (get-buffer-process existing)))
-        (pop-to-buffer existing)
+        (rig--show-terminal-buffer existing target-window)
       (when existing
         (kill-buffer existing))
       (let* ((vterm-shell (expand-file-name "bin/rig-tmux-attach" rig-root))
@@ -610,22 +644,40 @@ or `unavailable' when tmux does not return valid metadata."
               (cons (format "RIG_TMUX_SESSION=%s" name)
                     process-environment))
              (default-directory directory)
-             (buffer (vterm buffer-name)))
+             (buffer
+              (if target-window
+                  (with-selected-window target-window
+                    (let ((display-buffer-overriding-action
+                           (cons
+                            (lambda (buffer _alist)
+                              (let ((window
+                                     (rig--require-terminal-target-window
+                                      target-window)))
+                                (set-window-buffer window buffer)
+                                window))
+                            nil)))
+                      (vterm buffer-name)))
+                (vterm buffer-name))))
         (with-current-buffer buffer
           (rig-terminal-control-mode 1)
           (setq-local rig--terminal-session-label label)
           (setq-local default-directory directory))
-        (pop-to-buffer buffer)))))
+        (rig--show-terminal-buffer buffer target-window)))))
 
-(defun rig--open-session (seat name buffer-name label)
-  "Open SEAT in tmux session NAME and terminal BUFFER-NAME labeled LABEL."
+(defun rig--open-session (seat name buffer-name label &optional target-window)
+  "Open SEAT in tmux session NAME and terminal BUFFER-NAME labeled LABEL.
+
+When TARGET-WINDOW is non-nil, keep the session in that exact window."
+  (when target-window
+    (rig--require-terminal-target-window target-window))
   (rig--ensure-terminal-backend)
   (let ((config (rig--read-session-config seat)))
     (rig--ensure-work-areas seat config))
   (unless (rig--tmux-session-live-p name)
     (rig--start-tmux-session name seat))
   (rig--attach-tmux-session name buffer-name label
-                            (rig--seat-directory seat)))
+                            (rig--seat-directory seat)
+                            target-window))
 
 (defun rig--session-status (name label)
   "Report whether tmux session NAME for LABEL is running."

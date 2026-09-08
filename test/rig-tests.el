@@ -37,6 +37,31 @@
         (cons 'updated_at updated)
         (cons 'labels labels)))
 
+(defun rig-test--fake-vterm (&optional buffer-name)
+  "Create BUFFER-NAME and exercise vterm's real display call shape."
+  (let ((buffer (get-buffer-create buffer-name)))
+    (pop-to-buffer-same-window buffer)
+    buffer))
+
+(defun rig-test--write-nadia-fixture (root)
+  "Write the minimal ready Nadia configuration under ROOT."
+  (rig-test--write-file
+   root "fleet/session-defaults.toml"
+   (concat "runner = \"codex-cli\"\n"
+           "model = \"gpt-5.6-luna\"\n"
+           "reasoning_effort = \"high\"\n"
+           "sandbox_mode = \"workspace-write\"\n"
+           "approval_policy = \"on-request\"\n"
+           "approvals_reviewer = \"auto_review\"\n"))
+  (rig-test--write-file
+   root "fleet/nadia/member.toml"
+   (concat "slug = \"nadia\"\n"
+           "name = \"Nadia\"\n"
+           "status = \"ready\"\n"
+           "worktree = \"worktree\"\n"
+           "beads_actor = \"Nadia\"\n"))
+  (make-directory (expand-file-name "fleet/nadia/worktree" root) t))
+
 (ert-deftest rig-roster-discovers-and-orders-manifests ()
   (rig-test--with-temp-root
     (rig-test--write-file
@@ -295,8 +320,8 @@
                 ((symbol-function 'rig--beads-issues)
                  (lambda (_actor) nil))
                 ((symbol-function 'rig--open-session)
-                 (lambda (seat tmux buffer label)
-                   (setq opened (list seat tmux buffer label)
+                 (lambda (seat tmux buffer label &optional target-window)
+                   (setq opened (list seat tmux buffer label target-window)
                          selected-at-open (selected-window)))))
         (delete-other-windows)
         (let ((roster (rig-roster)))
@@ -304,9 +329,148 @@
             (rig-roster-activate))
           (should
            (equal opened
-                  '("md" "rig-md" "*rig-md*" "Managing Director")))
+                  (list "md" "rig-md" "*rig-md*" "Managing Director"
+                        selected-at-open)))
           (should-not (eq selected-at-open roster))
           (should (window-live-p roster)))))))
+
+(ert-deftest rig-roster-launch-ignores-hostile-display-rule ()
+  (rig-test--with-temp-root
+    (rig-test--write-nadia-fixture root)
+    (let* ((md-buffer (get-buffer-create "*rig-md*"))
+           (md-process (make-pipe-process
+                        :name "rig-test-md" :buffer md-buffer :noquery t))
+           (display-buffer-alist
+            '(("\\`\\*rig-fleet-nadia\\*\\'" display-buffer-pop-up-window))))
+      (unwind-protect
+          (cl-letf (((symbol-function 'rig--ensure-terminal-backend)
+                     #'ignore)
+                    ((symbol-function 'rig--tmux-session-live-p)
+                     (lambda (_name) t))
+                    ((symbol-function 'rig--tmux-attachment-state)
+                     (lambda (_name) "attached"))
+                    ((symbol-function 'rig--beads-issues)
+                     (lambda (_actor) nil))
+                    ((symbol-function 'vterm) #'rig-test--fake-vterm))
+            (delete-other-windows)
+            (let ((main-window (selected-window)))
+              (set-window-buffer main-window md-buffer)
+              (let ((roster-window (rig-roster)))
+                ;; Prove this ambient rule reproduces the reported third
+                ;; window before exercising Rig's protected placement path.
+                (select-window main-window)
+                (rig-test--fake-vterm "*rig-fleet-nadia*")
+                (let ((bug-window (selected-window)))
+                  (should (= (length (window-list nil 'nomini)) 3))
+                  (should-not (eq bug-window main-window))
+                  (delete-window bug-window))
+                (kill-buffer "*rig-fleet-nadia*")
+                (select-window roster-window)
+                (goto-char (point-min))
+                (search-forward "Nadia")
+                (beginning-of-line)
+                (rig-roster-activate)
+                (should (= (length (window-list nil 'nomini)) 2))
+                (should (window-live-p roster-window))
+                (should (eq (window-buffer roster-window)
+                            (get-buffer rig--roster-buffer-name)))
+                (should (window-live-p main-window))
+                (should (eq (selected-window) main-window))
+                (should (eq (window-buffer main-window)
+                            (get-buffer "*rig-fleet-nadia*")))
+                (should (buffer-live-p md-buffer))
+                (should (process-live-p md-process)))))
+        (when (process-live-p md-process)
+          (delete-process md-process))
+        (dolist (name '("*rig-md*" "*rig-fleet-nadia*"))
+          (when (get-buffer name)
+            (kill-buffer name)))))))
+
+(ert-deftest rig-terminal-target-preserves-unrelated-window-topology ()
+  (let ((target-buffer (get-buffer-create "*rig-test-target*"))
+        (unrelated-buffer (get-buffer-create "*rig-test-unrelated*")))
+    (unwind-protect
+        (cl-letf (((symbol-function 'rig--ensure-terminal-backend) #'ignore)
+                  ((symbol-function 'vterm) #'rig-test--fake-vterm))
+          (delete-other-windows)
+          (let* ((target-window (selected-window))
+                 (unrelated-window (split-window-right)))
+            (set-window-buffer target-window target-buffer)
+            (set-window-buffer unrelated-window unrelated-buffer)
+            (let ((windows-before (window-list nil 'nomini)))
+              (rig--attach-tmux-session
+               "rig-fleet-nadia" "*rig-fleet-nadia*" "Nadia"
+               default-directory target-window)
+              (should (equal (window-list nil 'nomini) windows-before))
+              (should (eq (window-buffer target-window)
+                          (get-buffer "*rig-fleet-nadia*")))
+              (should (eq (window-buffer unrelated-window) unrelated-buffer))
+              (should (eq (selected-window) target-window)))))
+      (dolist (name '("*rig-test-target*" "*rig-test-unrelated*"
+                      "*rig-fleet-nadia*"))
+        (when (get-buffer name)
+          (kill-buffer name))))))
+
+(ert-deftest rig-terminal-target-reuses-live-buffer-in-exact-window ()
+  (let* ((fleet-buffer (get-buffer-create "*rig-fleet-nadia*"))
+         (fleet-process (make-pipe-process
+                         :name "rig-test-nadia" :buffer fleet-buffer
+                         :noquery t)))
+    (unwind-protect
+        (cl-letf (((symbol-function 'rig--ensure-terminal-backend) #'ignore))
+          (delete-other-windows)
+          (let* ((target-window (selected-window))
+                 (other-window (split-window-right)))
+            (set-window-buffer other-window fleet-buffer)
+            (set-window-buffer target-window (get-buffer-create "*rig-md*"))
+            (rig--attach-tmux-session
+             "rig-fleet-nadia" "*rig-fleet-nadia*" "Nadia"
+             default-directory target-window)
+            (should (= (length (window-list nil 'nomini)) 2))
+            (should (eq (selected-window) target-window))
+            (should (eq (window-buffer target-window) fleet-buffer))
+            (should (eq (window-buffer other-window) fleet-buffer))
+            (should (process-live-p fleet-process))))
+      (when (process-live-p fleet-process)
+        (delete-process fleet-process))
+      (dolist (name '("*rig-md*" "*rig-fleet-nadia*"))
+        (when (get-buffer name)
+          (kill-buffer name))))))
+
+(ert-deftest rig-terminal-target-rejects-dead-window-precisely ()
+  (delete-other-windows)
+  (let ((dead-window (split-window-right))
+        vterm-called)
+    (delete-window dead-window)
+    (cl-letf (((symbol-function 'rig--ensure-terminal-backend) #'ignore)
+              ((symbol-function 'vterm)
+               (lambda (&rest _args) (setq vterm-called t))))
+      (let ((error
+             (should-error
+              (rig--attach-tmux-session
+               "rig-fleet-nadia" "*rig-fleet-nadia*" "Nadia"
+               default-directory dead-window)
+              :type 'user-error)))
+        (should
+         (equal (error-message-string error)
+                "Cannot display Rig terminal: target window is no longer live"))
+        (should-not vterm-called)))))
+
+(ert-deftest rig-direct-terminal-attach-retains-selected-window-behavior ()
+  (unwind-protect
+      (cl-letf (((symbol-function 'rig--ensure-terminal-backend) #'ignore)
+                ((symbol-function 'vterm) #'rig-test--fake-vterm))
+        (delete-other-windows)
+        (let ((target-window (selected-window)))
+          (rig--attach-tmux-session
+           "rig-fleet-nadia" "*rig-fleet-nadia*" "Nadia"
+           default-directory)
+          (should (= (length (window-list nil 'nomini)) 1))
+          (should (eq (selected-window) target-window))
+          (should (eq (window-buffer target-window)
+                      (get-buffer "*rig-fleet-nadia*")))))
+    (when (get-buffer "*rig-fleet-nadia*")
+      (kill-buffer "*rig-fleet-nadia*"))))
 
 (ert-deftest rig-start-opens-md-and-roster-then-focuses-terminal ()
   (let (roster-window)

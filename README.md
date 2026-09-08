@@ -38,7 +38,10 @@ labelled lifecycle, tmux, attachment, work, and task fields:
   state.
 
 The visible Roster refreshes every two minutes. Press `g` to refresh
-immediately; opening an identity also refreshes it immediately.
+immediately; opening an identity also refreshes it immediately. Opening an
+identity from the Roster replaces the buffer shown in the existing main window
+without splitting or rearranging other windows. The replaced terminal buffer
+and its process remain alive for later reopening.
 
 ## First Fleet Member
 
