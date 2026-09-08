@@ -72,10 +72,13 @@
                     :tmux "rig-fleet-nadia")))
     (cl-letf (((symbol-function 'rig--tmux-session-live-p)
                (lambda (_name) t))
+              ((symbol-function 'rig--tmux-attachment-state)
+               (lambda (_name) "attached"))
               ((symbol-function 'rig--beads-issues)
                (lambda (_actor) nil)))
       (let ((state (rig--identity-state identity)))
         (should (equal (plist-get state :session) "running"))
+        (should (equal (plist-get state :attachment) "attached"))
         (should (equal (plist-get state :work-state) "idle"))
         (should (equal (plist-get state :task-summary) "no active task"))))
     (cl-letf (((symbol-function 'rig--tmux-session-live-p)
@@ -85,7 +88,61 @@
                  (list (rig-test--issue "Implement roster" "2")))))
       (let ((state (rig--identity-state identity)))
         (should (equal (plist-get state :session) "stopped"))
+        (should-not (plist-get state :attachment))
         (should (equal (plist-get state :work-state) "assigned"))))))
+
+(ert-deftest rig-roster-detects-attached-tmux-session ()
+  (cl-letf (((symbol-function 'rig--required-executable)
+             (lambda (_name) "/test/bin/tmux"))
+            ((symbol-function 'process-file)
+             (lambda (&rest _args)
+               (insert "2\n")
+               0)))
+    (should (equal (rig--tmux-attachment-state "rig-md") "attached"))))
+
+(ert-deftest rig-roster-detects-detached-tmux-session ()
+  (cl-letf (((symbol-function 'rig--required-executable)
+             (lambda (_name) "/test/bin/tmux"))
+            ((symbol-function 'process-file)
+             (lambda (&rest _args)
+               (insert "0\n")
+               0)))
+    (should (equal (rig--tmux-attachment-state "rig-md") "detached"))))
+
+(ert-deftest rig-roster-reports-unavailable-tmux-attachment-metadata ()
+  (cl-letf (((symbol-function 'rig--required-executable)
+             (lambda (_name) "/test/bin/tmux"))
+            ((symbol-function 'process-file)
+             (lambda (&rest _args) 1)))
+    (should (equal (rig--tmux-attachment-state "rig-md") "unavailable"))))
+
+(ert-deftest rig-roster-preserves-unavailable-attachment-state ()
+  (let ((identity '(:name "Nadia" :actor "Nadia"
+                    :tmux "rig-fleet-nadia")))
+    (cl-letf (((symbol-function 'rig--tmux-session-live-p)
+               (lambda (_name) t))
+              ((symbol-function 'rig--tmux-attachment-state)
+               (lambda (_name) "unavailable"))
+              ((symbol-function 'rig--beads-issues)
+               (lambda (_actor) nil)))
+      (let ((state (rig--identity-state identity)))
+        (should (equal (plist-get state :session) "running"))
+        (should (equal (plist-get state :attachment) "unavailable"))))))
+
+(ert-deftest rig-roster-renders-unavailable-attachment-metadata ()
+  (with-temp-buffer
+    (cl-letf (((symbol-function 'rig--identity-state)
+               (lambda (identity)
+                 (append identity
+                         '(:session "running"
+                           :attachment "unavailable"
+                           :work-state "idle"
+                           :task-summary "no active task")))))
+      (rig--insert-roster-section
+       "Seats" '((:name "Managing Director" :lifecycle "active")) 40)
+      (should (string-match-p "Tmux: running" (buffer-string)))
+      (should (string-match-p "Attachment: unavailable"
+                              (buffer-string))))))
 
 (ert-deftest rig-roster-prioritizes-review-and-counts-additional-tasks ()
   (let ((issues
@@ -107,14 +164,20 @@
              (lambda (&optional _frame) 300)))
     (should (= (rig--roster-window-width) 40))))
 
-(ert-deftest rig-roster-keymaps-and-refresh-cadence-match-v1 ()
+(ert-deftest rig-roster-keymaps-and-refresh-cadence-match-current-policy ()
   (should (eq (lookup-key rig-terminal-control-mode-map (kbd "C-c r"))
               #'rig-roster))
   (should (eq (lookup-key rig-roster-mode-map (kbd "g"))
               #'rig-roster-refresh))
   (should (eq (lookup-key rig-roster-mode-map (kbd "RET"))
               #'rig-roster-activate))
-  (should (= rig--roster-refresh-seconds 10)))
+  (should (= rig--roster-refresh-seconds 120)))
+
+(ert-deftest rig-roster-uses-the-roster-product-name ()
+  (should (equal rig--roster-buffer-name "*Roster*"))
+  (with-temp-buffer
+    (rig-roster-mode)
+    (should (equal mode-name "Roster"))))
 
 (ert-deftest rig-roster-refresh-renders-sections-and-truncates ()
   (rig-test--with-temp-root
@@ -122,6 +185,7 @@
      root "md/seat.toml"
      (concat "slug = \"md\"\n"
              "name = \"Managing Director\"\n"
+             "status = \"active\"\n"
              "beads_actor = \"MD\"\n"))
     (rig-test--write-file
      root "fleet/nadia/member.toml"
@@ -130,7 +194,9 @@
              "status = \"ready\"\n"
              "beads_actor = \"Nadia\"\n"))
     (cl-letf (((symbol-function 'rig--tmux-session-live-p)
-               (lambda (_name) nil))
+               (lambda (name) (equal name "rig-md")))
+              ((symbol-function 'rig--tmux-attachment-state)
+               (lambda (_name) "detached"))
               ((symbol-function 'rig--beads-issues)
                (lambda (_actor)
                  (list
@@ -144,8 +210,27 @@
           (should (string-match-p "Fleet" (buffer-string)))
           (should (string-match-p "Managing Director" (buffer-string)))
           (should (string-match-p "Nadia" (buffer-string)))
-          (should (string-match-p "ready | stopped" (buffer-string)))
-          (should (string-match-p "assigned:" (buffer-string)))
+          (should (string-match-p "\\`Roster\n" (buffer-string)))
+          (should-not (string-match-p "Rig Roster" (buffer-string)))
+          (should (string-match-p "active: enabled management seat"
+                                  (buffer-string)))
+          (should (string-match-p "ready: onboarding gates passed"
+                                  (buffer-string)))
+          (should (string-match-p "running: tmux session exists"
+                                  (buffer-string)))
+          (should (string-match-p "attached: tmux client connected"
+                                  (buffer-string)))
+          (should (string-match-p "detached: no tmux clients"
+                                  (buffer-string)))
+          (should (string-match-p "These do not show Codex activity"
+                                  (buffer-string)))
+          (should (string-match-p "Lifecycle: active" (buffer-string)))
+          (should (string-match-p "Tmux: running" (buffer-string)))
+          (should (string-match-p "Attachment: detached" (buffer-string)))
+          (should (string-match-p "Lifecycle: ready" (buffer-string)))
+          (should (string-match-p "Tmux: stopped" (buffer-string)))
+          (should (string-match-p "Work: assigned" (buffer-string)))
+          (should (string-match-p "Task:" (buffer-string)))
           (goto-char (point-min))
           (while (not (eobp))
             (should (<= (- (line-end-position) (line-beginning-position))
@@ -155,8 +240,8 @@
 (ert-deftest rig-roster-truncation-preserves-additional-task-count ()
   (should
    (equal (rig--truncate-task-summary
-           "A long task title that must shrink +2" 24 "  assigned: ")
-          "A long t… +2")))
+           "A long task title that must shrink +2" 24 "Task: ")
+          "A long task ti… +2")))
 
 (ert-deftest rig-roster-close-and-reopen-is-window-local ()
   (rig-test--with-temp-root

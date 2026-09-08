@@ -12,7 +12,7 @@ Start with the [overview](overview.md). Maintenance history is in the [log](log.
 - [Codex agent instructions](sources/codex-agent-instructions.md): documented project-root-to-working-directory instruction precedence used for fleet homes.
 - [Gas Town mail](sources/gastown-mail.md): persistent mailbox commands, town-level Beads storage, and the provider boundary behind `bd mail`.
 - [Operator Git authority](sources/operator-git-authority.md): direct authorization for seats and fleet members to modify local Git state.
-- [Operator Rig Roster and fleet-pull direction](sources/operator-roster-and-pull-direction.md): accepted roster name/startup behavior, pull-based work, Nadia trial, and optional-mail boundary.
+- [Operator Roster and fleet-pull direction](sources/operator-roster-and-pull-direction.md): corrected Roster name and state semantics, startup behavior, refresh cadence, pull-based work, Nadia trial, and optional-mail boundary.
 - [Operator runtime policy](sources/operator-runtime-policy.md): Auto-review plus Sol/high for MD and Luna/high for fleet implementation.
 - [Operator task-start Git direction](sources/operator-task-start-git-sync.md): synchronize after accepting new work, not while an identity is idle.
 
@@ -27,6 +27,7 @@ Start with the [overview](overview.md). Maintenance history is in the [log](log.
 - [Fleet member lifecycle](decisions/fleet-member-lifecycle.md): onboarding, cross-boarding, off-boarding, pull/review handoff, and optional notification mail.
 - [Local Git authority](decisions/git-authority.md): scoped local Git rights for seats, MD, and fleet members; remote authority remains separate.
 - [Task-start Git synchronization](decisions/task-start-git-synchronization.md): clean-state and current-base gate after claim and before edits.
+- [Roster state and refresh](decisions/roster-state-and-refresh.md): labelled lifecycle, tmux, attachment, and work semantics with a two-minute visible refresh.
 
 ## Syntheses
 

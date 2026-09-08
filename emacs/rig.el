@@ -31,11 +31,11 @@
 (defconst rig--md-seat "md")
 (defconst rig--md-tmux-session "rig-md")
 (defconst rig--md-buffer-name "*rig-md*")
-(defconst rig--roster-buffer-name "*Rig Roster*")
-(defconst rig--roster-refresh-seconds 10)
+(defconst rig--roster-buffer-name "*Roster*")
+(defconst rig--roster-refresh-seconds 120)
 
 (defvar rig--roster-refresh-timer nil
-  "Timer used to refresh the Rig Roster while it is visible.")
+  "Timer used to refresh the Roster while it is visible.")
 
 (defvar-local rig--terminal-session-label nil
   "Human-readable label for the Rig session in the current terminal buffer.")
@@ -220,15 +220,17 @@ Return :unavailable when Beads cannot be queried."
 (defun rig--identity-state (identity)
   "Add observable session and work state to IDENTITY."
   (let* ((issues (rig--beads-issues (plist-get identity :actor)))
+         (session-live (rig--tmux-session-live-p
+                        (plist-get identity :tmux)))
          (work-state (cond
-                      ((eq issues :unavailable) "work unknown")
+                      ((eq issues :unavailable) "unknown")
                       ((null issues) "idle")
                       (t "assigned"))))
     (append identity
-            (list :session (if (rig--tmux-session-live-p
-                                (plist-get identity :tmux))
-                               "running"
-                             "stopped")
+            (list :session (if session-live "running" "stopped")
+                  :attachment (and session-live
+                                   (rig--tmux-attachment-state
+                                    (plist-get identity :tmux)))
                   :work-state work-state
                   :task-summary (rig--task-summary issues)))))
 
@@ -242,9 +244,9 @@ Return :unavailable when Beads cannot be queried."
     (define-key map (kbd "g") #'rig-roster-refresh)
     (define-key map (kbd "RET") #'rig-roster-activate)
     map)
-  "Keymap for Rig Roster buffers.")
+  "Keymap for Roster buffers.")
 
-(define-derived-mode rig-roster-mode special-mode "Rig-Roster"
+(define-derived-mode rig-roster-mode special-mode "Roster"
   "Read-only view of declared Rig identities and observable state."
   (setq-local truncate-lines t))
 
@@ -271,11 +273,11 @@ Return :unavailable when Beads cannot be queried."
       (insert "  None\n")
     (dolist (identity identities)
       (let* ((state (rig--identity-state identity))
-             (lifecycle (plist-get state :lifecycle))
-             (session-parts
-              (delq nil (list lifecycle (plist-get state :session))))
+             (lifecycle (or (plist-get state :lifecycle) "unknown"))
+             (session (plist-get state :session))
+             (attachment (plist-get state :attachment))
              (work-state (plist-get state :work-state))
-             (task-prefix (format "%s: " work-state))
+             (task-prefix "Task: ")
              (task-line
               (concat task-prefix
                       (rig--truncate-task-summary
@@ -287,8 +289,19 @@ Return :unavailable when Beads cannot be queried."
           (format "  %s" (plist-get state :name)) width nil nil "…")
          "\n"
          (truncate-string-to-width
-          (string-join session-parts " | ")
-          width nil nil "…")
+          (format "Lifecycle: %s" lifecycle) width nil nil "…")
+         "\n"
+         (truncate-string-to-width
+          (format "Tmux: %s" session) width nil nil "…")
+         "\n"
+         (if attachment
+             (concat
+              (truncate-string-to-width
+               (format "Attachment: %s" attachment) width nil nil "…")
+              "\n")
+           "")
+         (truncate-string-to-width
+          (format "Work: %s" work-state) width nil nil "…")
          "\n"
          task-line
          "\n")
@@ -300,7 +313,7 @@ Return :unavailable when Beads cannot be queried."
   (insert "\n"))
 
 (defun rig-roster-refresh ()
-  "Refresh the Rig Roster immediately from manifests and live state."
+  "Refresh the Roster immediately from manifests and live state."
   (interactive)
   (let* ((buffer (get-buffer-create rig--roster-buffer-name))
          (identity (and (eq (current-buffer) buffer)
@@ -317,9 +330,16 @@ Return :unavailable when Beads cannot be queried."
         (rig-roster-mode))
       (let ((inhibit-read-only t))
         (erase-buffer)
-        (insert (propertize "Rig Roster\n"
+        (insert (propertize "Roster\n"
                             'face '(:weight bold :height 1.1)))
         (insert "g refresh  RET open\nC-x 0 close\n\n")
+        (insert (propertize "State key\n" 'face 'bold))
+        (insert "active: enabled management seat\n")
+        (insert "ready: onboarding gates passed\n")
+        (insert "running: tmux session exists\n")
+        (insert "attached: tmux client connected\n")
+        (insert "detached: no tmux clients\n")
+        (insert "These do not show Codex activity.\n\n")
         (rig--insert-roster-section "Seats" (car groups) width)
         (rig--insert-roster-section "Fleet" (cadr groups) width)
         (goto-char (point-min))
@@ -355,7 +375,7 @@ Return :unavailable when Beads cannot be queried."
     (rig--roster-cancel-refresh)))
 
 (defun rig--roster-schedule-refresh ()
-  "Schedule ten-second roster refreshes while the roster is visible."
+  "Schedule two-minute Roster refreshes while it is visible."
   (rig--roster-cancel-refresh)
   (setq rig--roster-refresh-timer
         (run-with-timer rig--roster-refresh-seconds
@@ -371,7 +391,7 @@ Return :unavailable when Beads cannot be queried."
 
 ;;;###autoload
 (defun rig-roster ()
-  "Open or focus the Rig Roster in a normal left-side window."
+  "Open or focus the Roster in a normal left-side window."
   (interactive)
   (let* ((buffer (rig-roster-refresh))
          (window (or (get-buffer-window buffer t)
@@ -429,7 +449,7 @@ Return :unavailable when Beads cannot be queried."
     (when error-message
       (user-error "%s" error-message))
     (unless (window-live-p main-window)
-      (user-error "Rig Roster needs a main window for the terminal"))
+      (user-error "Roster needs a main window for the terminal"))
     (select-window main-window)
     (rig--open-session (plist-get identity :seat)
                        (plist-get identity :tmux)
@@ -492,6 +512,27 @@ Return :unavailable when Beads cannot be queried."
   "Return non-nil when tmux session NAME exists."
   (eq 0 (call-process (rig--required-executable "tmux")
                       nil nil nil "has-session" "-t" name)))
+
+(defun rig--tmux-attachment-state (name)
+  "Return attachment state for existing tmux session NAME.
+
+The result is `attached' for one or more clients, `detached' for zero clients,
+or `unavailable' when tmux does not return valid metadata."
+  (condition-case nil
+      (with-temp-buffer
+        (let ((status
+               (process-file
+                (rig--required-executable "tmux") nil t nil
+                "display-message" "-p" "-t" name "#{session_attached}")))
+          (if (not (eq status 0))
+              "unavailable"
+            (let ((count (string-trim (buffer-string))))
+              (if (not (string-match-p "\\`[0-9]+\\'" count))
+                  "unavailable"
+                (if (> (string-to-number count) 0)
+                    "attached"
+                  "detached"))))))
+    (error "unavailable")))
 
 (defun rig--start-tmux-session (name seat)
   "Start tmux session NAME using the configuration for SEAT."
@@ -633,7 +674,7 @@ Return :unavailable when Beads cannot be queried."
 
 ;;;###autoload
 (defun rig-start ()
-  "Open MD and the Rig Roster, leaving the terminal in the main window."
+  "Open MD and the Roster, leaving the terminal in the main window."
   (interactive)
   (rig-md)
   (let ((terminal-window (selected-window)))

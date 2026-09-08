@@ -2,7 +2,7 @@
 
 Rig is a small Emacs control center for a management seat and persistent implementation fleet. Aaron directs Managing Director (MD); MD records requirements in Beads, delegates implementation, and validates fleet output.
 
-For a complete shutdown and restart with the Rig Roster sidebar, follow the
+For a complete shutdown and restart with the Roster sidebar, follow the
 [restart quickstart](quickstart.md).
 
 ## Open MD
@@ -20,6 +20,25 @@ Rig displays Codex through Emacs `vterm`, attached to the persistent tmux sessio
 Inside an existing Emacs instance, load `emacs/rig.el` and run `M-x rig-md`. Use `M-x rig-md-status` to check the session. In MD's terminal buffer, press `F12` to enter or leave vterm copy mode. Copy mode gives normal keyboard control to Emacs; press `F12` again after returning to MD. On a Mac keyboard whose function row controls media, use `fn-F12`. The reserved `C-c C-j` and `C-c C-k` bindings explicitly select Emacs and Codex control, while `C-c d` detaches without stopping MD.
 
 Rig uses tmux for persistence. Closing Emacs leaves MD running. Ending an agent session remains a deliberate, manual handoff: ask MD to update its task and continuity records, wait for it to finish, and then exit Codex. A dedicated handoff command is future work.
+
+## Roster
+
+Rig opens the `*Roster*` sidebar at startup. Each identity shows separate,
+labelled lifecycle, tmux, attachment, work, and task fields:
+
+- `active` means a management seat is enabled; it does not mean the agent is
+  busy.
+- `ready` means a fleet member passed the onboarding gates and may accept work;
+  it does not mean a process exists.
+- `running` means the named tmux session exists. It does not show whether Codex
+  is working or waiting for input.
+- `attached` means one or more tmux clients are connected; `detached` means a
+  running session has no connected clients.
+- `stopped` means the tmux session does not exist, so it has no attachment
+  state.
+
+The visible Roster refreshes every two minutes. Press `g` to refresh
+immediately; opening an identity also refreshes it immediately.
 
 ## First Fleet Member
 

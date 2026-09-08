@@ -149,3 +149,11 @@ Added a root quickstart for completing agent handoffs, stopping only `rig-md` an
 ## [2026-09-07] lint | Rig restart quickstart
 
 Syntax-checked the read-only listing and targeted tmux shutdown snippets without executing them. Checked the quickstart plus all twenty-two knowledgebase Markdown files: zero broken relative links. Confirmed `bin/rig-emacs` loads `emacs/rig.el` and invokes `rig-start`, which opens MD and the Rig Roster.
+
+## [2026-09-08] decision | Roster name, state, and refresh
+
+Recorded Aaron's correction that the Rig component is named Roster, clarified lifecycle, tmux existence, attachment, and work as independent labelled dimensions, and replaced the ten-second visible refresh with an exact 120-second cadence. Preserved the observability boundary: these states do not report whether Codex is actively working.
+
+## [2026-09-08] lint | Roster clarification
+
+Checked all relative links across twenty-three Markdown files under `knowledgebase/wiki/`: zero broken links. Confirmed current user documentation and Emacs help/messages use Roster, while immutable source captures and historical log entries preserve superseded terminology.

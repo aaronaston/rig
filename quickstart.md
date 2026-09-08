@@ -73,21 +73,31 @@ From the repository root in a normal terminal:
 The launcher should:
 
 - open a fresh MD session in the main `*rig-md*` window;
-- open `*Rig Roster*` as the left sidebar;
+- open `*Roster*` as the left sidebar;
 - show **Managing Director** under **Seats**; and
-- show **Nadia** under **Fleet**, initially as `ready | stopped`.
+- show **Nadia** under **Fleet**, with labelled lifecycle, tmux, work, and task
+  state.
 
 Move to Nadia's roster entry and press `RET` to start her Luna/high Auto-review
-session in the main window. The roster remains open. Starting Nadia should
-change her session state to `running` on the next refresh.
+session in the main window. The Roster remains open. Starting Nadia should
+change `Tmux` to `running` and show `Attachment: attached` immediately.
+
+`Lifecycle: active` means the management seat is enabled. `Lifecycle: ready`
+means a fleet member passed onboarding and may accept work. Neither is a busy
+signal. `Tmux: running` means only that the named tmux session exists;
+`Attachment: attached` means at least one tmux client is connected, while
+`detached` means a running session has none. These fields do not report whether
+Codex is working or waiting for input.
 
 ## Roster controls
 
 - `RET` — start or attach the identity at point.
-- `g` — refresh the roster immediately.
-- `C-x 0` — close the roster window normally.
-- `M-x rig-roster` — reopen the roster from anywhere.
-- `C-c r` — reopen the roster from a Rig terminal buffer.
+- `g` — refresh the Roster immediately.
+- `C-x 0` — close the Roster window normally.
+- `M-x rig-roster` — reopen the Roster from anywhere.
+- `C-c r` — reopen the Roster from a Rig terminal buffer.
+
+While visible, the Roster also refreshes automatically every two minutes.
 
 ## Troubleshooting
 
