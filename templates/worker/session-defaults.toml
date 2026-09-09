@@ -1,0 +1,4 @@
+schema_version = 1
+
+# Optional worker-specific overrides. Omitted values inherit from
+# ../../fleet/session-defaults.toml.

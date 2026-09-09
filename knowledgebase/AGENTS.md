@@ -59,8 +59,9 @@ Check for orphan pages, missing index entries, broken links, stale claims, contr
 - Cite title, author, URL, access date, and relevant section for web sources. Label excerpts and incomplete captures accurately.
 - Distinguish user requirements, accepted decisions, proposals, source claims, and inference.
 - Maintain one singleton Managing Director seat in root `md/`, with they/them
-  pronouns by MD's expressed preference. Named generalist workers currently live
-  under the compatibility `fleet/` path; Nadia is the first Worker. Do not
+  pronouns by MD's expressed preference. Named generalist workers live under
+  the compatibility `fleet/` path in instance branches. The core `main` branch
+  contains no onboarded worker. Do not
   conflate the management seat, durable workers, or transient native subagents.
 - Treat display name, stable routing slug, durable home, Codex session ID, tmux
   runtime, worktree, Beads actor, and notification channel as separate evidence

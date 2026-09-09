@@ -48,9 +48,9 @@ worker worktrees for lifecycle management and validation.
 Synchronization is tied to accepting work, not to idle time or session startup.
 After claiming each new Bead and before editing, the worker verifies a clean
 worktree and resolved prior work, then updates their branch from the current
-integration branch. In Rig's current local-only repository this is
-`git -C worktree merge --ff-only main` from the worker's durable home, not
-`git pull`. A failed fast-forward or unique prior work returns to MD for an
+integration branch. The instance worker record supplies that branch, so the
+command is `git -C worktree merge --ff-only <integration-branch>` from the
+worker's durable home, not `git pull`. A failed fast-forward or unique prior work returns to MD for an
 explicit disposition; it is not forced, automatically rebased, or discarded.
 At handoff, the worker reports whether `main` advanced during implementation.
 
@@ -122,8 +122,8 @@ second task system.
 
 The installed `bd mail` command delegates to an external provider. On
 2026-09-06 no `mail.delegate` was configured, and `bd mail inbox` returned
-`no mail delegate configured`. Nadia's address is therefore reserved but not
-provisioned. This does not block her readiness. Bead `beads-tests-dze.2` tracks
+`no mail delegate configured`. A worker address may be reserved but not
+provisioned. This does not block readiness. Bead `beads-tests-dze.2` tracks
 optional notification-provider evaluation. Until Rig needs an automatic wake-up
 channel, Beads comments and state changes are the durable handoff record and
 active tmux coordination supplies the live signal.

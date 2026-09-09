@@ -36,6 +36,7 @@ config_value() {
 
 worktree=$(config_value worktree)
 branch=$(config_value branch)
+integration_branch=$(config_value integration_branch)
 
 case "$worktree" in
     ''|/*|*..*)
@@ -49,14 +50,19 @@ if [ -z "$branch" ]; then
     exit 1
 fi
 
+if [ -z "$integration_branch" ]; then
+    printf 'Missing integration_branch value in %s\n' "$member_config" >&2
+    exit 1
+fi
+
 if [ -e "$member_home/$worktree" ]; then
     printf 'Worktree path already exists: %s\n' "$member_home/$worktree" >&2
     exit 1
 fi
 
 if [ "$check_only" = true ]; then
-    printf 'member=%s\nhome=%s\nworktree=%s\nbranch=%s\n' \
-        "$member" "$member_home" "$member_home/$worktree" "$branch"
+    printf 'member=%s\nhome=%s\nworktree=%s\nbranch=%s\nintegration_branch=%s\n' \
+        "$member" "$member_home" "$member_home/$worktree" "$branch" "$integration_branch"
     exit 0
 fi
 

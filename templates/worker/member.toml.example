@@ -1,0 +1,15 @@
+schema_version = 1
+
+slug = "worker-slug"
+display_name = "Worker name"
+role = "worker"
+manager = "md"
+operator = "Aaron"
+
+status = "ready"
+worktree = "worktree"
+branch = "fleet/worker-slug"
+integration_branch = "main"
+beads_actor = "Worker name"
+mailbox_address = "fleet/worker-slug"
+mailbox_state = "unconfigured"

@@ -76,14 +76,14 @@ The launcher should:
 - open a fresh MD session in the main `*rig-md*` window;
 - open `*Roster*` as the left sidebar;
 - show **Managing Director** under **Seats**; and
-- show **Nadia** under **Workers**, with labelled lifecycle, tmux, work, and task
-  state.
+- show each worker configured by the current instance under **Workers**, with
+  labelled lifecycle, tmux, work, and task state.
 
-Move to Nadia's roster entry and press `RET` to start her Luna/high Auto-review
-worker session in the existing main window. The Roster remains open, no extra window
-is created, and the replaced MD buffer and process remain alive for reopening.
-Starting Nadia should change `Tmux` to `running` and show `Attachment: attached`
-immediately.
+Move to a worker's roster entry and press `RET` to start or attach their worker
+session in the existing main window. The Roster remains open, no extra window is
+created, and the replaced MD buffer and process remain alive for reopening.
+Starting a worker should change `Tmux` to `running` and show `Attachment:
+attached` immediately.
 
 `Lifecycle: active` means the management seat is enabled. `Lifecycle: ready`
 means a worker passed onboarding and may accept work. Neither is a busy
@@ -110,9 +110,9 @@ While visible, the Roster also refreshes automatically every two minutes.
   `rig-md` or `rig-fleet-<worker>` session and launch again.
 - **Vterm is unavailable:** run `./bin/rig-install-emacs-deps`, then restart
   Emacs.
-- **Nadia says provisioning:** run `./bin/rig-fleet-onboard --check nadia` and
-  resolve the reported gate before starting her.
+- **A worker says provisioning:** run `./bin/rig-fleet-onboard --check
+  <worker-slug>` and resolve the reported gate before starting them.
 
-Do not delete Nadia's worktree or branch during a normal session restart. Git
-synchronization happens only after she claims her next Bead and before she
-begins editing.
+Do not delete a worker's worktree or branch during a normal session restart.
+Git synchronization happens only after they claim their next Bead and before
+they begin editing.

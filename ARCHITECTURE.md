@@ -14,7 +14,7 @@ remains accountable for the work.
 ```text
 Aaron
   └── Managing Director (MD) — singleton seat
-        ├── Nadia — durable named Worker
+        ├── a durable named Worker in an instance
         │     ├── temporary explorer subagent
         │     └── temporary reviewer subagent
         └── another durable named Worker
@@ -34,8 +34,8 @@ These identifiers and resources are related, but none substitutes for another:
 
 | Concept | Meaning | Lifetime |
 | --- | --- | --- |
-| Display name | The unique human-facing address of a durable worker, such as Nadia | Until deliberate off-boarding or rename |
-| Slug | Stable routing and filesystem key, such as `nadia`; not a separate persona or opaque worker UUID | Normally the worker's lifetime |
+| Display name | The unique human-facing address of a durable worker | Until deliberate off-boarding or rename |
+| Slug | Stable routing and filesystem key; not a separate persona or opaque worker UUID | Normally the worker's lifetime |
 | Codex session ID | Codex's identifier for one saved, resumable conversation history | One Codex conversation, including later resumes |
 | tmux session | The live terminal process that makes a running MD or worker discoverable and attachable | Until that process exits or is stopped |
 | Durable home | Identity bootstrap, preferences, session defaults, and continuity material | The worker's lifetime |
@@ -50,9 +50,9 @@ worker manifest.
 
 A worker may accumulate several Codex session IDs over their lifetime. Resuming
 an ID continues that saved conversation; it does not create or define the
-worker identity. Conversely, replacing a Codex session does not replace Nadia:
-a new session starts in her durable home, loads her instructions and Beads
-state, and continues under her name. At most one top-level runtime may occupy a
+worker identity. Conversely, replacing a Codex session does not replace the
+worker: a new session starts in their durable home, loads their instructions and
+Beads state, and continues under their name. At most one top-level runtime may occupy a
 named identity at once unless Aaron explicitly authorizes a fork and gives it a
 different operational identity.
 
@@ -85,9 +85,10 @@ the Aaron-MD conversation remains responsive.
 
 A name is an operational promise, not merely decoration. It identifies the
 same durable home, working agreements, Beads actor, attributable history, and
-contact point across replaceable sessions and worktrees. Nadia is therefore a
-unique named generalist Worker, not the Software Engineer role and not a label
-that MD may apply to an unrelated child agent.
+contact point across replaceable sessions and worktrees. Each instance chooses
+its own unique named generalist Workers;
+the core does not reserve a worker identity or permit MD to apply a worker's
+name to an unrelated child agent.
 
 Continuity is reconstructed from durable evidence rather than assumed model
 memory:
@@ -113,7 +114,7 @@ type into the same session.
 A worker may create native Codex subagents for independent, bounded work such
 as exploration, testing, calculation, or review. The parent worker owns the
 Bead, integrates the results, and remains accountable. A child uses a task
-label such as `power-budget-reviewer`; it never impersonates Nadia or another
+label such as `power-budget-reviewer`; it never impersonates a worker or another
 durable worker. Native children are agent threads inside the parent's Codex
 workflow, not separate Rig workers or tmux sessions. In Codex CLI they can be
 inspected with `/agent`. OpenAI recommends starting with read-heavy parallel
@@ -149,12 +150,18 @@ MD summarizes exceptions and brings Aaron only the decisions that need him.
 
 ## Current compatibility boundary
 
-Rig's current implementation still stores worker homes under `fleet/` and uses
+Rig's current implementation stores worker homes under `fleet/` and uses
 internal names such as `member.toml`, `rig-fleet-*`, and `rig-fleet-member`.
 These are compatibility paths and APIs, not the current conceptual model.
 User-facing documentation and the Roster call the group **Workers**. Renaming
 the storage and command surface is a separate migration because it affects
 worktrees, branches, tmux names, scripts, tests, and saved operating habits.
+
+The `main` branch is the worker-free Rig core. A durable worker belongs to an
+instance branch such as `test-instance`. Core releases flow from `main` into
+that branch. A worker's task-start synchronization uses its instance's declared
+integration branch, so it receives both the core release and the instance's
+configuration.
 
 ## Deeper implementation questions
 

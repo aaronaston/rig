@@ -10,10 +10,10 @@ the knowledgebase contains durable documentation, not a parallel task queue.
 Aaron is the operator. Managing Director (MD), in root `md/`, is Aaron's
 singleton conversational delegate for requirements capture, Beads work
 definition, worker orchestration, and validation. MD uses they/them pronouns by
-their expressed preference. Durable named workers are generalists; Nadia, using
-she/her pronouns, is the first Worker. Runner, model, Codex session ID, and tmux
-process remain replaceable runtime properties. Ask design questions in visible
-replies.
+their expressed preference. Durable named workers are generalists. The core
+repository intentionally has no onboarded worker; an instance branch supplies
+their identity and home. Runner, model, Codex session ID, and tmux process
+remain replaceable runtime properties. Ask design questions in visible replies.
 
 A Codex session launched through Rig may occupy the MD seat or a named worker
 identity. MD starts in `md/`; a worker currently starts in the compatibility
@@ -51,10 +51,11 @@ the Bead and before editing, verify the owned worktree is clean and prior work
 is resolved, then update the owned branch from the current integration branch.
 
 This repository currently has no Git remote, so a worker using the compatibility
-`fleet/<worker>/` home runs `git -C worktree merge --ff-only main`; this is not a
-`git pull`. If the fast-forward is impossible or unique prior work remains,
+`fleet/<worker>/` home runs `git -C worktree merge --ff-only <integration-branch>`;
+this is not a `git pull`. The instance records that branch in its worker
+configuration; core-only workers use `main`. If the fast-forward is impossible or unique prior work remains,
 stop and return the conflict to MD without forcing, rebasing, or discarding.
-At handoff, report whether `main` advanced during implementation. MD decides
+At handoff, report whether the integration branch advanced during implementation. MD decides
 how any resulting divergence is integrated. Seats follow the same clean-state
 and current-base principle on their owned branch, subject to configured remotes
 and the remote-operation authority above.

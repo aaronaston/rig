@@ -53,54 +53,37 @@ identity from the Roster replaces the buffer shown in the existing main window
 without splitting or rearranging other windows. The replaced terminal buffer
 and its process remain alive for later reopening.
 
-## First Named Worker
+## Core and instances
 
-MD selected [Nadia](fleet/nadia/README.md), a named generalist Worker who uses
-she/her pronouns, as Rig's first worker. Her display name identifies the durable
-collaborator; her Codex session ID identifies the current resumable conversation.
-Her durable home is `fleet/nadia/`; her isolated checkout belongs at
-`fleet/nadia/worktree/` on branch `fleet/nadia`.
+`main` is Rig's worker-free core: the Emacs control center, shared worker
+defaults, templates, tests, and operating model. It deliberately has no
+onboarded worker manifests. A branch such as `test-instance` adds durable
+worker homes and its own operating configuration.
+
+Core changes flow from `main` into an instance branch. Each worker's
+`member.toml` declares the instance integration branch it fast-forwards from at
+task start. That means a worker receives both the core release and the instance
+configuration without merging core directly into the worker branch.
+
+To onboard a worker in an instance, copy the files in
+[`templates/worker/`](templates/worker/), substitute a unique slug and display
+name, set `integration_branch`, add the resulting worker home with `git add -f`,
+then provision and launch them:
+
+```sh
+./bin/rig-fleet-onboard --check <worker-slug>
+./bin/rig-fleet-onboard <worker-slug>
+./bin/rig-fleet-emacs <worker-slug>
+```
 
 The `fleet/` directory and `rig-fleet-*` commands are current compatibility
-names. They implement the worker model but have not yet been migrated because
-their paths are embedded in worktrees, branches, tmux sessions, tests, and
-operating habits.
+names. Worker sessions use tmux names and buffers derived from their stable
+slug. `M-x rig-fleet-member`, `M-x rig-fleet-member-status`, and
+`M-x rig-fleet-member-detach` accept that slug.
 
-Provision the worktree once:
-
-```sh
-./bin/rig-fleet-onboard --check nadia
-./bin/rig-fleet-onboard nadia
-```
-
-Then launch Nadia in a new Emacs instance:
-
-```sh
-./bin/rig-fleet-emacs nadia
-```
-
-From an existing Emacs instance, load `emacs/rig.el` and run the compatibility
-command `M-x rig-fleet-member`. Worker sessions use tmux names and buffers
-derived from the stable worker slug; Nadia uses `rig-fleet-nadia` and
-`*rig-fleet-nadia*`. `M-x rig-fleet-member-status` and
-`M-x rig-fleet-member-detach` accept the same slug. Worker sessions inherit a
-distinct `BEADS_ACTOR` from the worker record.
-
-Workers inherit [`fleet/session-defaults.toml`](fleet/session-defaults.toml):
-Luna with high reasoning, the same workspace-write sandbox, and Auto-review. A
-worker's optional `session-defaults.toml` can override individual values. These
-settings are fixed when a Codex process starts; resuming a saved session may
-apply explicit launch-time overrides permitted by Codex.
-
-A worker branch is synchronized at task start, not while idle. After claiming a
-new Bead and before editing, the worker verifies a clean worktree and
-fast-forwards from the then-current local `main`. Because this repository has
-no remote, that operation is a local merge rather than `git pull`.
-
-`bd mail` is not itself a mailbox: it delegates to a configured external provider. No provider is configured yet, so Nadia's mailbox address is reserved but not operational. Until delivery is proven, use Beads comments and notes for handoff.
-
-Mail is optional notification infrastructure, not an onboarding gate or a task
-ledger. Nadia is ready: her worktree, identity, shared Beads access, reviewed implementation
-trial, and refreshed Luna/high Auto-review validation cycle are proven.
+Workers inherit [`fleet/session-defaults.toml`](fleet/session-defaults.toml).
+Their optional `session-defaults.toml` files can override individual values.
+`bd mail` is optional notification infrastructure; Beads comments and notes
+remain the durable handoff path until delivery is proven.
 
 Project knowledge starts at [`knowledgebase/wiki/index.md`](knowledgebase/wiki/index.md). Work is tracked in Beads.

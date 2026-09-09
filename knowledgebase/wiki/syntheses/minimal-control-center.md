@@ -1,6 +1,6 @@
 # Minimal Rig control center
 
-Status: MD launcher implemented; Nadia is ready as the first named Worker.
+Status: MD launcher implemented; the core is ready for instance worker onboarding.
 [Scope and naming](../decisions/initial-scope.md) and the [named-worker
 architecture](../decisions/named-generalist-worker-architecture.md) reflect the
 latest operator direction.
@@ -22,19 +22,18 @@ resume remain to be implemented and proven.
 MD stays available for operator conversation, clarifies and records requirements,
 delegates execution, and validates outputs. Emacs is the console, while tmux
 keeps live processes visible when Emacs detaches. Runner-neutral defaults are
-translated to Codex CLI commands. The first Worker is Nadia; her durable home
-and name survive replacement of her isolated worktree and Codex session.
+translated to Codex CLI commands. An instance worker's durable home and name
+survive replacement of their isolated worktree and Codex session.
 
 MD starts in `md/` with the main repository as an additional work area. A worker
-starts in their durable home, such as `fleet/nadia/`, with `worktree/` as an
+starts in their durable home under `fleet/<worker>/`, with `worktree/` as an
 additional writable area. This makes closer worker instructions effective while
 isolating code changes. See the [seat home](../decisions/seat-home.md) and
 [worker lifecycle](../decisions/fleet-member-lifecycle.md) decisions.
 
 MD sessions use Sol/high for requirements and validation. Worker sessions inherit
 Luna/high for bounded execution. Both launch with workspace-write and
-Auto-review; Nadia's refreshed validation cycle completed Beads and local Git
-operations without surfacing a command approval to Aaron.
+Auto-review. Each instance validates its own runtime and local Git cycle.
 
 Workers may create bounded native subagents while retaining ownership of the
 parent Bead and consolidated output. Native child threads are inspectable inside

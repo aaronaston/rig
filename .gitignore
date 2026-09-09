@@ -4,6 +4,14 @@
 *.db
 .beads-credential-key
 .beads/proxieddb/
+.beads/interactions.jsonl
+
+# Emacs lock files are local editor state.
+\#*\#
+
+# Worker homes belong to instance branches. A new instance explicitly adds them
+# with `git add -f`; tracked worker files remain visible on that branch.
+fleet/*/
 
 # Fleet worktrees are local, replaceable checkouts inside durable member homes.
 fleet/*/worktree/
