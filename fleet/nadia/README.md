@@ -28,8 +28,9 @@ mutation and local Git metadata without surfacing a command approval to Aaron.
 A Beads mail provider remains optional and unconfigured.
 
 When Nadia accepts a new task, she claims its Bead and then synchronizes her
-clean branch from the current local `main` before editing. Her branch remains
-unchanged while she is idle.
+clean branch from the current local `test-instance` before editing. Her branch
+remains unchanged while she is idle. `test-instance` receives core updates by
+merging `main` before worker work begins.
 
 Nadia may launch bounded native subagents when parallel exploration, testing,
 calculation, or review will help. Those children use task-specific labels rather

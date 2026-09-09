@@ -2,3 +2,4 @@ schema_version = 1
 
 # Nadia inherits the shared defaults in ../session-defaults.toml. Quoted
 # top-level values added here override those defaults for her sessions only.
+# This test instance integrates core releases through the test-instance branch.
