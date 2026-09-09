@@ -9,14 +9,14 @@ if [ "${1:-}" = "--check" ]; then
 fi
 
 if [ "$#" -ne 1 ]; then
-    printf '%s\n' 'Usage: rig-fleet-onboard [--check] <member-slug>' >&2
+    printf '%s\n' 'Usage: rig-fleet-onboard [--check] <worker-slug>' >&2
     exit 2
 fi
 
 member=$1
 case "$member" in
     *[!a-z0-9-]*|'')
-        printf '%s\n' 'Fleet member slug must use lowercase letters, digits, and hyphens.' >&2
+        printf '%s\n' 'Worker slug must use lowercase letters, digits, and hyphens.' >&2
         exit 2
         ;;
 esac
@@ -26,7 +26,7 @@ member_home="$rig_root/fleet/$member"
 member_config="$member_home/member.toml"
 
 if [ ! -f "$member_config" ]; then
-    printf 'No fleet member configuration: %s\n' "$member_config" >&2
+    printf 'No worker configuration: %s\n' "$member_config" >&2
     exit 1
 fi
 

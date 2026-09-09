@@ -1,10 +1,10 @@
 schema_version = 1
 
 slug = "nadia"
-name = "Nadia"
+display_name = "Nadia"
 gender = "woman"
 pronouns = "she/her"
-role = "software-engineer"
+role = "worker"
 manager = "md"
 operator = "Aaron"
 

@@ -4,12 +4,13 @@ Date: 2026-09-08. Status: accepted.
 
 The Emacs identity sidebar is named **Roster**. User-facing buffer, title,
 documentation, help, and messages use that name; internal `rig-` Lisp symbols
-and tmux session names remain unchanged.
+and compatibility `rig-fleet-` tmux session names remain unchanged. The Roster
+groups durable implementers under **Workers**, not Fleet.
 
 Each identity renders four independent state dimensions plus its task summary:
 
-- **Lifecycle:** `active` means an enabled management seat. `ready` means a
-  fleet member has passed onboarding gates and may accept work. Neither value
+- **Lifecycle:** `active` means the MD seat is enabled. `ready` means a worker
+  has passed onboarding gates and may accept work. Neither value
   is a busy signal or evidence of a running process.
 - **Tmux:** `running` means the named tmux session exists; `stopped` means it
   does not. This does not reveal whether Codex is working or waiting for input.
@@ -19,6 +20,11 @@ Each identity renders four independent state dimensions plus its task summary:
   rather than guessed.
 - **Work:** `assigned`, `idle`, or `unknown` comes from the identity's open
   and in-progress Beads assignments and remains separate from process state.
+
+Future Roster state may add the current Codex session ID, resumable history,
+worker availability (`working`, `waiting`, `idle`, or `stopped`), blocker
+ownership, and observable child-agent activity. These require runtime capture
+and should not be inferred from tmux existence or Beads assignment alone.
 
 The Roster refreshes automatically every 120 seconds only while visible.
 Manual `g` refresh and refresh after an identity action remain immediate. This

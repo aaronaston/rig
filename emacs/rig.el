@@ -1,7 +1,7 @@
 ;;; rig.el --- Emacs console for Rig sessions -*- lexical-binding: t; -*-
 
-;; Rig keeps seat and fleet identity separate from the agent client and model
-;; used by a particular session.
+;; Rig keeps durable named identity separate from the agent client, Codex
+;; session history, and model used by a particular runtime.
 
 (require 'subr-x)
 (require 'term)
@@ -106,10 +106,10 @@ intentionally not a general TOML parser."
       config)))
 
 (defun rig--read-session-config (seat)
-  "Read and merge Rig's session and optional member configuration for SEAT.
+  "Read and merge Rig's session and optional worker configuration for SEAT.
 
-Fleet members inherit the shared fleet session defaults.  A member-specific
-session-defaults.toml is optional and takes precedence when present."
+Workers currently stored below fleet/ inherit its shared session defaults.  A
+worker-specific session-defaults.toml is optional and takes precedence."
   (let* ((seat-directory (rig--seat-directory seat))
          (session-file (expand-file-name "session-defaults.toml" seat-directory))
          (member-file (expand-file-name "member.toml" seat-directory))
@@ -130,7 +130,9 @@ session-defaults.toml is optional and takes precedence when present."
          (slug (or (plist-get config :slug)
                    (file-name-nondirectory (directory-file-name home))))
          (seat (if (eq kind 'fleet) (format "fleet/%s" slug) slug))
-         (name (or (plist-get config :name) (capitalize slug)))
+         (name (or (plist-get config :display_name)
+                   (plist-get config :name)
+                   (capitalize slug)))
          (actor (or (plist-get config :beads_actor) name)))
     (list :kind kind
           :slug slug
@@ -150,7 +152,9 @@ session-defaults.toml is optional and takes precedence when present."
                         (format "*rig-%s*" slug))))))
 
 (defun rig--discover-identities ()
-  "Discover declared Rig seats and fleet members from their manifests."
+  "Discover declared Rig seats and named workers from their manifests.
+
+Worker manifests remain under fleet/ as a compatibility path."
   (let ((seat-files
          (file-expand-wildcards (expand-file-name "*/seat.toml" rig-root)))
         (fleet-files
@@ -341,7 +345,7 @@ Return :unavailable when Beads cannot be queried."
         (insert "detached: no tmux clients\n")
         (insert "These do not show Codex activity.\n\n")
         (rig--insert-roster-section "Seats" (car groups) width)
-        (rig--insert-roster-section "Fleet" (cadr groups) width)
+        (rig--insert-roster-section "Workers" (cadr groups) width)
         (goto-char (point-min))
         (when identity-key
           (let (match)
@@ -735,26 +739,28 @@ When TARGET-WINDOW is non-nil, keep the session in that exact window."
       (select-window terminal-window))))
 
 (defun rig--fleet-seat (member)
-  "Return the seat path for fleet MEMBER."
+  "Return the compatibility fleet/ path for worker MEMBER."
   (format "fleet/%s" member))
 
 (defun rig--fleet-tmux-session (member)
-  "Return the tmux session name for fleet MEMBER."
+  "Return the compatibility tmux session name for worker MEMBER."
   (format "rig-fleet-%s" member))
 
 (defun rig--fleet-buffer-name (member)
-  "Return the Emacs buffer name for fleet MEMBER."
+  "Return the compatibility Emacs buffer name for worker MEMBER."
   (format "*rig-fleet-%s*" member))
 
 ;;;###autoload
 (defun rig-fleet-member (member)
-  "Open fleet MEMBER, creating their persistent session when necessary."
-  (interactive "sFleet member slug: ")
+  "Open worker MEMBER, creating their persistent session when necessary.
+
+This command name is retained for compatibility with the fleet/ storage path."
+  (interactive "sWorker slug: ")
   (unless (string-match-p "\\`[a-z0-9-]+\\'" member)
-    (user-error "Invalid fleet member slug: %s" member))
+    (user-error "Invalid worker slug: %s" member))
   (let ((seat (rig--fleet-seat member)))
     (unless (file-directory-p (rig--seat-directory seat))
-      (user-error "Unknown fleet member: %s" member))
+      (user-error "Unknown worker: %s" member))
     (rig--open-session seat
                        (rig--fleet-tmux-session member)
                        (rig--fleet-buffer-name member)
@@ -762,15 +768,15 @@ When TARGET-WINDOW is non-nil, keep the session in that exact window."
 
 ;;;###autoload
 (defun rig-fleet-member-status (member)
-  "Report whether fleet MEMBER's persistent session is running."
-  (interactive "sFleet member slug: ")
+  "Report whether worker MEMBER's persistent session is running."
+  (interactive "sWorker slug: ")
   (rig--session-status (rig--fleet-tmux-session member)
                        (capitalize member)))
 
 ;;;###autoload
 (defun rig-fleet-member-detach (member)
-  "Detach fleet MEMBER's terminal while leaving their session running."
-  (interactive "sFleet member slug: ")
+  "Detach worker MEMBER's terminal while leaving their session running."
+  (interactive "sWorker slug: ")
   (rig--detach-buffer (rig--fleet-buffer-name member)
                       (capitalize member)))
 

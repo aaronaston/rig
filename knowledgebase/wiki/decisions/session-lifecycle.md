@@ -2,7 +2,12 @@
 
 Date: 2026-09-06. Status: adopted for Rig v0.
 
-MD's session runs inside a tmux session named `rig-md`. Emacs owns the user-facing terminal buffer and can detach or reattach without ending Codex. Closing Emacs therefore leaves MD running.
+MD's live process runs inside a tmux session named `rig-md`. Emacs owns the
+user-facing terminal buffer and can detach or reattach without ending Codex.
+Closing Emacs therefore leaves MD running. Codex separately assigns an ID to
+the saved conversation history; `codex resume <SESSION>` or `/resume` can reload
+that history after the process exits. The Codex session ID does not identify the
+durable MD seat.
 
 Emacs attaches to tmux through `vterm`. Live use showed that the built-in `term` emulator mishandled both Codex's alternate screen and in-place status redraws: disabling the alternate screen made the session visible, but status updates accumulated as scrolling lines. `vterm` is a full terminal emulator backed by `libvterm`, so Codex now uses its normal alternate-screen interface. See the [terminal-backend source record](../sources/emacs-terminal-backends.md).
 

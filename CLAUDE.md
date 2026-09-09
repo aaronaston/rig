@@ -2,17 +2,43 @@
 
 ## Rig Knowledgebase
 
-Read [knowledgebase/wiki/index.md](knowledgebase/wiki/index.md) for project sources, scope, and decisions. Follow [knowledgebase/AGENTS.md](knowledgebase/AGENTS.md) when maintaining the knowledgebase. Beads remains the task and status system; the knowledgebase contains durable documentation, not a parallel task queue. Working project name: Rig. Aaron is the operator. Managing Director (MD), in root `md/`, is Aaron's delegate for requirements capture, Beads work definition, fleet orchestration, and validation. MD uses they/them pronouns by their expressed preference. Fleet implementers live under `fleet/`; Nadia, a Software Engineer using she/her pronouns, is the first member. Runner and model remain replaceable session properties. Ask design questions in visible replies.
+Read [ARCHITECTURE.md](ARCHITECTURE.md) for Rig's operating model and
+[knowledgebase/wiki/index.md](knowledgebase/wiki/index.md) for project sources,
+scope, and decisions. Follow [knowledgebase/AGENTS.md](knowledgebase/AGENTS.md)
+when maintaining the knowledgebase. Beads remains the task and status system;
+the knowledgebase contains durable documentation, not a parallel task queue.
+Aaron is the operator. Managing Director (MD), in root `md/`, is Aaron's
+singleton conversational delegate for requirements capture, Beads work
+definition, worker orchestration, and validation. MD uses they/them pronouns by
+their expressed preference. Durable named workers are generalists; Nadia, using
+she/her pronouns, is the first Worker. Runner, model, Codex session ID, and tmux
+process remain replaceable runtime properties. Ask design questions in visible
+replies.
 
-A Codex session launched through Rig may occupy the MD seat or a fleet identity. MD starts in `md/`; a fleet member starts in their durable `fleet/<member>/` home and receives their isolated `worktree/` as an additional work area. Closer instruction files refine these repository instructions. Read [md/README.md](md/README.md) and [fleet/README.md](fleet/README.md). Wait for Aaron or MD to assign work rather than inventing a startup task.
+A Codex session launched through Rig may occupy the MD seat or a named worker
+identity. MD starts in `md/`; a worker currently starts in the compatibility
+path `fleet/<worker>/` and receives their isolated `worktree/` as an additional
+work area. The worker's display name is durable; the Codex session ID identifies
+one saved, resumable conversation and does not define the worker. Closer
+instruction files refine these repository instructions. Read
+[md/README.md](md/README.md) and [fleet/README.md](fleet/README.md). Wait for
+Aaron or MD to assign work rather than inventing a startup task.
+
+Named workers may launch bounded native subagents for independent work when
+delegation is explicitly requested or authorized by applicable instructions.
+Subagents use task-specific labels, never the durable worker's name. The parent
+worker owns the Bead, consolidates results, and remains accountable. Serialize
+write-heavy child work or provide isolated work areas. Durable workers remain
+discoverable through their tmux sessions; native child threads are inspected
+inside the parent Codex client rather than treated as separate Rig identities.
 
 ## Git Authority
 
-Rig explicitly authorizes its seats and fleet members to use local Git for assigned work. This project-owned policy supersedes the conservative local-Git default in generated Beads instruction blocks below.
+Rig explicitly authorizes its seat and named workers to use local Git for assigned work. This project-owned policy supersedes the conservative local-Git default in generated Beads instruction blocks below.
 
 - Seats may inspect Git state, create branches, stage changes, and make local commits for documentation and other assigned repository updates.
-- MD may create, inspect, repair, and retire fleet-member worktrees and branches as part of onboarding, cross-boarding, validation, and off-boarding.
-- Fleet members may create, inspect, update, commit within, and retire their own worktree and branch. They must not modify another member's worktree or branch, or the main checkout, unless MD explicitly reassigns that scope.
+- MD may create, inspect, repair, and retire worker worktrees and branches as part of onboarding, cross-boarding, validation, and off-boarding.
+- Workers may create, inspect, update, commit within, and retire their own worktree and branch. They must not modify another worker's worktree or branch, or the main checkout, unless MD explicitly reassigns that scope.
 - Before destructive branch or worktree operations, resolve the exact target and verify that unique work is committed, transferred, or intentionally discarded.
 - Remote pushes, force-pushes, remote configuration changes, and Dolt remote synchronization require separate direction from Aaron or MD. Local Git authority does not imply remote publication authority.
 - A higher-level sandbox or orchestrator restriction can still prevent Git writes. If it does, report that external restriction precisely; do not reinterpret it as repository policy.
@@ -24,8 +50,8 @@ is idle and not merely because a session starts or reconnects. After claiming
 the Bead and before editing, verify the owned worktree is clean and prior work
 is resolved, then update the owned branch from the current integration branch.
 
-This repository currently has no Git remote, so a fleet member working from
-their durable home uses `git -C worktree merge --ff-only main`; this is not a
+This repository currently has no Git remote, so a worker using the compatibility
+`fleet/<worker>/` home runs `git -C worktree merge --ff-only main`; this is not a
 `git pull`. If the fast-forward is impossible or unique prior work remains,
 stop and return the conflict to MD without forcing, rebasing, or discarding.
 At handoff, report whether `main` advanced during implementation. MD decides

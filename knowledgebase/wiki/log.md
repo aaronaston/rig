@@ -172,3 +172,41 @@ evidence.
 Checked all relative links across twenty-three Markdown files under
 `knowledgebase/wiki/` after documenting deterministic Roster placement: zero
 broken links. Confirmed the existing Roster decision remains indexed.
+
+## [2026-09-09] ingest | Operator named generalist worker direction
+
+Recorded Aaron's acceptance of one singleton conversational MD seat and durable,
+named, generalist Workers. Preserved his requirements that workers remain
+tmux-discoverable, may manage bounded native subagents, can pause on durable
+Beads blockers, can be explicitly awakened after an answer, and can participate
+in structured standups. Recorded the proposal to use Codex's existing resumable
+session ID alongside a durable display name rather than inventing an opaque
+worker UUID.
+
+## [2026-09-09] decision | Named workers and resumable sessions
+
+Added the canonical top-level `ARCHITECTURE.md` and accepted the separation among
+display name, stable routing slug, Codex session ID, tmux runtime, durable home,
+worktree, Bead, and native subagent thread. Nadia remains a unique named Worker;
+her Software Engineer specialization is superseded. A Codex session ID identifies
+one resumable saved conversation and may change across Nadia's lifetime. Beads
+records blocking state but does not itself wake the waiting process.
+
+## [2026-09-09] implementation | Active worker terminology
+
+Reconciled root and seat instructions, MD and Nadia bootstraps, manifests,
+runtime defaults, lifecycle and authority decisions, README and quickstart,
+knowledgebase index and overview, and the Roster heading. User-facing language
+now says Workers. Existing `fleet/`, `member.toml`, `rig-fleet-*`, and related
+symbols remain explicit compatibility surfaces pending a separately tracked
+migration. Added Beads follow-ups for session capture/resume, structured
+standups, wake-up notification, and compatibility migration.
+
+## [2026-09-09] lint | Named worker architecture
+
+Ran the complete ERT suite with 25 of 25 passing, strict byte compilation,
+shell syntax checks, `git diff --check`, and generated-bytecode inspection.
+Checked relative links across all 59 repository Markdown files outside worker
+worktrees and the unrelated editor backup: zero broken links. Confirmed Roster
+renders **Workers** and both `display_name` manifests and legacy `name` fixtures
+remain supported.

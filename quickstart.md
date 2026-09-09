@@ -1,8 +1,9 @@
 # Rig restart quickstart
 
 Use this procedure to end every Rig-managed agent session, close the old Emacs
-process, and restart Rig with the roster sidebar. It targets `rig-md` and
-`rig-fleet-*` tmux sessions only; unrelated tmux sessions are left alone.
+process, and restart Rig with the roster sidebar. It targets `rig-md` and the
+compatibility `rig-fleet-*` worker tmux sessions only; unrelated tmux sessions
+are left alone.
 
 ## 1. Finish agent handoffs
 
@@ -30,7 +31,7 @@ tmux list-sessions -F '#{session_name}' 2>/dev/null |
   grep -E '^rig-(md|fleet-)' || true
 ```
 
-After the handoffs are complete, stop the MD session and every fleet session
+After the handoffs are complete, stop the MD session and every worker session
 without touching unrelated tmux sessions:
 
 ```sh
@@ -75,17 +76,17 @@ The launcher should:
 - open a fresh MD session in the main `*rig-md*` window;
 - open `*Roster*` as the left sidebar;
 - show **Managing Director** under **Seats**; and
-- show **Nadia** under **Fleet**, with labelled lifecycle, tmux, work, and task
+- show **Nadia** under **Workers**, with labelled lifecycle, tmux, work, and task
   state.
 
 Move to Nadia's roster entry and press `RET` to start her Luna/high Auto-review
-session in the existing main window. The Roster remains open, no extra window
+worker session in the existing main window. The Roster remains open, no extra window
 is created, and the replaced MD buffer and process remain alive for reopening.
 Starting Nadia should change `Tmux` to `running` and show `Attachment: attached`
 immediately.
 
 `Lifecycle: active` means the management seat is enabled. `Lifecycle: ready`
-means a fleet member passed onboarding and may accept work. Neither is a busy
+means a worker passed onboarding and may accept work. Neither is a busy
 signal. `Tmux: running` means only that the named tmux session exists;
 `Attachment: attached` means at least one tmux client is connected, while
 `detached` means a running session has none. These fields do not report whether
@@ -106,7 +107,7 @@ While visible, the Roster also refreshes automatically every two minutes.
 - **Roster missing:** run `M-x rig-roster`. If that command is unavailable,
   fully quit Emacs and restart with `./bin/rig-emacs`.
 - **Old session reappears:** inspect `tmux list-sessions`; stop the exact
-  `rig-md` or `rig-fleet-<member>` session and launch again.
+  `rig-md` or `rig-fleet-<worker>` session and launch again.
 - **Vterm is unavailable:** run `./bin/rig-install-emacs-deps`, then restart
   Emacs.
 - **Nadia says provisioning:** run `./bin/rig-fleet-onboard --check nadia` and

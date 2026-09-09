@@ -2,14 +2,29 @@
 
 ## Purpose
 
-Preserve sources, decisions, and operating knowledge for a small control center beginning with one Managing Director seat
+Preserve sources, decisions, and operating knowledge for a local control center
+with one Managing Director seat and durable named generalist workers
 
 ## Current Synthesis
 
-The [shared-chat findings and cited essays](sources/wheelhouse.md) provide the starting context. Rig has one management seat, Managing Director in root `md/`, and an initial fleet member under `fleet/`. MD uses they/them pronouns by their expressed bootstrap preference. Aaron is the operator; MD is his delegate for requirements, Beads work definition, fleet orchestration, and output validation. [Nadia](../../fleet/nadia/README.md), a Software Engineer who uses she/her pronouns, is the first fleet member and is ready.
+The [shared-chat findings and cited essays](sources/wheelhouse.md) provide the
+starting context. Rig has one singleton management seat, Managing Director in
+root `md/`, and durable named generalist Workers currently stored under the
+compatibility `fleet/` path. MD uses they/them pronouns by their expressed
+bootstrap preference. Aaron is the operator; MD is his conversational delegate
+for requirements, Beads work definition, worker orchestration, blocker
+resolution, and output validation. [Nadia](../../fleet/nadia/README.md), who uses
+she/her pronouns, is the first Worker and is ready.
 
 ## Open Questions
 
-The [delegation decision](decisions/md-delegation-and-fleet.md) and [fleet lifecycle](decisions/fleet-member-lifecycle.md) define the operating boundary. Nadia's worktree, pull/review trial, and Luna/high Auto-review cycle are proven. Her reserved mailbox is optional and unconfigured. Track remaining fleet work under Beads epic `beads-tests-dze`; use this knowledgebase for sources and decisions, not a second task queue.
+The [named-worker architecture](decisions/named-generalist-worker-architecture.md),
+[delegation decision](decisions/md-delegation-and-fleet.md), and [worker
+lifecycle](decisions/fleet-member-lifecycle.md) define the operating boundary.
+Nadia's worktree, pull/review trial, and Luna/high Auto-review cycle are proven.
+Codex session-ID capture/resume, automatic wake-up, structured standup, and
+compatibility-path migration remain implementation questions tracked in Beads.
+Her reserved mailbox is optional and unconfigured. Use this knowledgebase for
+sources and decisions, not a second task queue.
 
 Return to the [index](index.md).

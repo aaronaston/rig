@@ -6,12 +6,12 @@ task queue.
 
 ## Authority
 
-- Rig seats and fleet members are authorized to use local Git for assigned
+- The MD seat and named workers are authorized to use local Git for assigned
   work, subject to the scope in the applicable `AGENTS.md` files.
-- MD may create, inspect, repair, and retire fleet-member worktrees and
+- MD may create, inspect, repair, and retire worker worktrees and
   branches after preserving or deliberately disposing of unique work.
-- Fleet members may manage their own worktree and branch. They must not modify
-  another member's worktree or branch, or the main checkout, unless MD
+- Workers may manage their own worktree and branch. They must not modify
+  another worker's worktree or branch, or the main checkout, unless MD
   explicitly reassigns that scope.
 - Remote pushes, force-pushes, remote configuration changes, and Dolt remote
   synchronization require separate direction from Aaron or MD.
@@ -25,7 +25,8 @@ task queue.
 - Claim work with `bd update <id> --claim`.
 - After claiming and before the first edit, synchronize the owned branch from
   the current integration branch. Verify the worktree is clean and prior work
-  is resolved first. In this local-only repository, a fleet member runs
+  is resolved first. In this local-only repository, a worker using the retained
+  `fleet/<worker>/` compatibility home runs
   `git -C worktree merge --ff-only main` from their durable home. Do not update
   idle branches speculatively. If fast-forward is impossible, stop and return
   the divergence to MD without forcing, rebasing, or discarding.

@@ -1,7 +1,7 @@
 schema_version = 1
 
 slug = "md"
-name = "Managing Director"
+display_name = "Managing Director"
 role = "managing-director"
 status = "active"
 beads_actor = "MD"

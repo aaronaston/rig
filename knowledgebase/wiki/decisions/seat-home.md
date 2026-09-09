@@ -8,4 +8,7 @@ The seat directory contains the role definition, seat-specific instructions, and
 
 MD still needs to implement work across Rig. The launcher therefore grants the parent repository as an additional work area. Seat home and work scope are separate concepts: `md/` supplies identity and local context, while the repository root supplies the shared project, knowledgebase, and Beads database.
 
-This arrangement does not create code isolation. Before Rig adds concurrent seats that edit the same project, it must decide whether each seat needs a worktree, clone, or another isolation mechanism.
+This arrangement does not create code isolation for MD. Durable named workers
+use separate worktrees for concurrent writing. Native subagents remain within
+their parent's runtime authority and must not write concurrently in the same
+checkout unless the parent provides additional isolation.

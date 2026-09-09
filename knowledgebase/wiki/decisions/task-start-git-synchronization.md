@@ -6,9 +6,10 @@ Every Rig identity synchronizes its owned work area when beginning a newly
 accepted task. The synchronization point is after claiming the Bead and before
 editing. It is not session startup, reconnection, or idle time.
 
-For a fleet member in the current local-only repository:
+For a worker using the current compatibility `fleet/<worker>/` home in this
+local-only repository:
 
-1. Verify the member worktree is clean and prior work is resolved.
+1. Verify the worker worktree is clean and prior work is resolved.
 2. From the durable home, run `git -C worktree merge --ff-only main`.
 3. Begin implementation only after the fast-forward succeeds.
 4. At handoff, report whether `main` advanced after implementation began.
@@ -18,7 +19,7 @@ command. If a remote is added later, remote fetch/pull behavior remains subject
 to the repository's authority policy and should be defined separately.
 
 If the task-start fast-forward cannot succeed, or the worktree contains unique
-prior work, the member stops and returns the conflict to MD. They do not force,
+prior work, the worker stops and returns the conflict to MD. They do not force,
 automatically rebase, discard, or alter another identity's branch. MD records
 the unique-work disposition and selects an integration strategy.
 

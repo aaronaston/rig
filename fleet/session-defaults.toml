@@ -1,7 +1,8 @@
 schema_version = 1
 
-# These replaceable runtime defaults apply to every fleet member. A member may
-# override individual quoted values in fleet/<member>/session-defaults.toml.
+# These replaceable runtime defaults apply to every named Worker. The fleet/
+# path is retained for compatibility; a worker may override individual quoted
+# values in fleet/<worker>/session-defaults.toml.
 runner = "codex-cli"
 model = "gpt-5.6-luna"
 reasoning_effort = "high"

@@ -4,7 +4,8 @@ This directory is the project's self-maintaining plain-Markdown knowledgebase. R
 
 ## Purpose
 
-Preserve sources, decisions, and operating knowledge for a small control center beginning with one Managing Director seat
+Preserve sources, decisions, and operating knowledge for a local control center
+with one Managing Director seat and durable named generalist workers
 
 ## Audience
 
@@ -57,8 +58,17 @@ Check for orphan pages, missing index entries, broken links, stale claims, contr
 - Use `bd remember` for short operational facts when explicitly requested; do not create MEMORY.md files.
 - Cite title, author, URL, access date, and relevant section for web sources. Label excerpts and incomplete captures accurately.
 - Distinguish user requirements, accepted decisions, proposals, source claims, and inference.
-- Maintain one Managing Director seat in root `md/`, with they/them pronouns by MD's expressed preference. Fleet implementers live under `fleet/`; Nadia is the first member. Do not conflate management seats with fleet members.
-- Treat identity, durable home, worktree, runtime session, Beads actor, and mailbox as separate evidence states. Do not call a member ready until required onboarding gates are proven or explicitly waived.
+- Maintain one singleton Managing Director seat in root `md/`, with they/them
+  pronouns by MD's expressed preference. Named generalist workers currently live
+  under the compatibility `fleet/` path; Nadia is the first Worker. Do not
+  conflate the management seat, durable workers, or transient native subagents.
+- Treat display name, stable routing slug, durable home, Codex session ID, tmux
+  runtime, worktree, Beads actor, and notification channel as separate evidence
+  states. Do not call a worker ready until required onboarding gates are proven
+  or explicitly waived.
+- A worker's Codex session ID identifies one resumable saved conversation, not
+  the worker. Preserve shared decisions in the knowledgebase and task state in
+  Beads rather than relying on a session transcript or worker-local files.
 - Check relative links after material wiki changes and append the result to the log.
 
 Initialized: 2026-09-05

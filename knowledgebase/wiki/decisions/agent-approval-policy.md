@@ -2,7 +2,8 @@
 
 Date: 2026-09-07. Status: accepted.
 
-Rig-launched MD and fleet sessions use this Codex policy:
+Rig-launched MD and worker sessions use this Codex policy. The shared worker
+defaults still live under the compatibility `fleet/` path:
 
 ```text
 --sandbox workspace-write --ask-for-approval on-request --config approvals_reviewer=auto_review
@@ -23,7 +24,7 @@ not as a guarantee that every possible interaction can proceed unattended.
 The launcher reads `sandbox_mode`, `approval_policy`, and `approvals_reviewer`
 from the role's session defaults and emits the explicit long-form arguments.
 Existing tmux sessions retain their original process configuration and must be
-stopped and relaunched to adopt this policy. A bounded refreshed fleet cycle is
+stopped and relaunched to adopt this policy. A bounded refreshed worker cycle is
 required before the non-interactive onboarding gate is considered proven.
 
 Source: [operator runtime direction](../sources/operator-runtime-policy.md).

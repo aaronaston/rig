@@ -56,7 +56,7 @@
   (rig-test--write-file
    root "fleet/nadia/member.toml"
    (concat "slug = \"nadia\"\n"
-           "name = \"Nadia\"\n"
+           "display_name = \"Nadia\"\n"
            "status = \"ready\"\n"
            "worktree = \"worktree\"\n"
            "beads_actor = \"Nadia\"\n"))
@@ -67,22 +67,22 @@
     (rig-test--write-file
      root "ops/seat.toml"
      (concat "slug = \"ops\"\n"
-             "name = \"Operations\"\n"
+             "display_name = \"Operations\"\n"
              "beads_actor = \"Ops\"\n"))
     (rig-test--write-file
      root "md/seat.toml"
      (concat "slug = \"md\"\n"
-             "name = \"Managing Director\"\n"
+             "display_name = \"Managing Director\"\n"
              "beads_actor = \"MD\"\n"))
     (rig-test--write-file
      root "fleet/zara/member.toml"
      (concat "slug = \"zara\"\n"
-             "name = \"Zara\"\n"
+             "display_name = \"Zara\"\n"
              "status = \"ready\"\n"))
     (rig-test--write-file
      root "fleet/amy/member.toml"
      (concat "slug = \"amy\"\n"
-             "name = \"Amy\"\n"
+             "display_name = \"Amy\"\n"
              "status = \"ready\"\n"))
     (pcase-let ((`(,seats ,fleet) (rig--discover-identities)))
       (should (equal (mapcar (lambda (item) (plist-get item :name)) seats)
@@ -209,13 +209,13 @@
     (rig-test--write-file
      root "md/seat.toml"
      (concat "slug = \"md\"\n"
-             "name = \"Managing Director\"\n"
+             "display_name = \"Managing Director\"\n"
              "status = \"active\"\n"
              "beads_actor = \"MD\"\n"))
     (rig-test--write-file
      root "fleet/nadia/member.toml"
      (concat "slug = \"nadia\"\n"
-             "name = \"Nadia\"\n"
+             "display_name = \"Nadia\"\n"
              "status = \"ready\"\n"
              "beads_actor = \"Nadia\"\n"))
     (cl-letf (((symbol-function 'rig--tmux-session-live-p)
@@ -232,7 +232,7 @@
         (with-current-buffer buffer
           (should (eq major-mode 'rig-roster-mode))
           (should (string-match-p "Seats" (buffer-string)))
-          (should (string-match-p "Fleet" (buffer-string)))
+          (should (string-match-p "Workers" (buffer-string)))
           (should (string-match-p "Managing Director" (buffer-string)))
           (should (string-match-p "Nadia" (buffer-string)))
           (should (string-match-p "\\`Roster\n" (buffer-string)))
