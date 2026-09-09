@@ -210,3 +210,10 @@ Checked relative links across all 59 repository Markdown files outside worker
 worktrees and the unrelated editor backup: zero broken links. Confirmed Roster
 renders **Workers** and both `display_name` manifests and legacy `name` fixtures
 remain supported.
+
+## [2026-09-09] decision | Core and instance branches
+
+Accepted private publication of `aaronaston/rig` with a worker-free `main`
+core and a `test-instance` branch holding the current Nadia environment.
+Documented the instance integration branch, the one-time retention merge, and
+the exclusion of live runtime state from core publication.

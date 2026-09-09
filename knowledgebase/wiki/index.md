@@ -28,6 +28,7 @@ Start with the [overview](overview.md). Maintenance history is in the [log](log.
 - [MD session lifecycle](decisions/session-lifecycle.md): Emacs attachment, tmux persistence, and deliberate session exit.
 - [Seat home and work area](decisions/seat-home.md): `md/` as working directory with the parent repository available for shared work.
 - [Named generalist worker architecture](decisions/named-generalist-worker-architecture.md): singleton conversational MD, durable named workers, session identity, tmux visibility, subagents, blockers, and standups.
+- [Core and instance branches](decisions/core-and-instance-branches.md): worker-free core publication, instance ownership, and integration-branch updates.
 - [MD delegation and workers](decisions/md-delegation-and-fleet.md): operator/MD authority, substantial-execution delegation, and instance worker onboarding.
 - [Named worker lifecycle](decisions/fleet-member-lifecycle.md): onboarding, session history, tmux runtime, subagents, blocking, cross-boarding, off-boarding, and handoff.
 - [Local Git authority](decisions/git-authority.md): scoped local Git rights for MD and named workers; remote authority remains separate.
