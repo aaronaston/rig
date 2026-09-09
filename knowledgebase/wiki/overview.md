@@ -9,22 +9,20 @@ with one Managing Director seat and durable named generalist workers
 
 The [shared-chat findings and cited essays](sources/wheelhouse.md) provide the
 starting context. Rig has one singleton management seat, Managing Director in
-root `md/`, and durable named generalist Workers currently stored under the
-compatibility `fleet/` path. MD uses they/them pronouns by their expressed
-bootstrap preference. Aaron is the operator; MD is his conversational delegate
-for requirements, Beads work definition, worker orchestration, blocker
-resolution, and output validation. [Nadia](../../fleet/nadia/README.md), who uses
-she/her pronouns, is the first Worker and is ready.
+root `md/`, and durable named generalist Workers stored under the compatibility
+`fleet/` path by individual instances. MD uses they/them pronouns by their
+expressed bootstrap preference. Aaron is the operator; MD is his conversational
+delegate for requirements, Beads work definition, worker orchestration, blocker
+resolution, and output validation. The `main` branch is worker-free core;
+instance branches supply their own workers.
 
 ## Open Questions
 
 The [named-worker architecture](decisions/named-generalist-worker-architecture.md),
 [delegation decision](decisions/md-delegation-and-fleet.md), and [worker
 lifecycle](decisions/fleet-member-lifecycle.md) define the operating boundary.
-Nadia's worktree, pull/review trial, and Luna/high Auto-review cycle are proven.
 Codex session-ID capture/resume, automatic wake-up, structured standup, and
 compatibility-path migration remain implementation questions tracked in Beads.
-Her reserved mailbox is optional and unconfigured. Use this knowledgebase for
-sources and decisions, not a second task queue.
+Use this knowledgebase for sources and decisions, not a second task queue.
 
 Return to the [index](index.md).

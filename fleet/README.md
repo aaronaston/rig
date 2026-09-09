@@ -1,10 +1,11 @@
 # Rig Workers
 
-`fleet/` currently contains durable homes for Rig's named generalist workers.
-The directory name is a compatibility surface; **Workers** is the current
-concept. Workers are distinct from the Managing Director seat: Aaron directs
-MD, MD assigns bounded Beads work to workers, and MD validates their output
-before accepting it.
+`fleet/` is the compatibility location for durable homes for Rig's named
+generalist workers. The directory name is a compatibility surface; **Workers**
+is the current concept. The core `main` branch deliberately contains no worker
+home. An instance branch creates `fleet/<worker>/` from
+[`templates/worker/`](../templates/worker/) and adds that home with
+`git add -f`.
 
 Each worker home is `fleet/<worker>/` and contains identity, operating
 instructions, and optional worker-specific session overrides. Shared
@@ -30,17 +31,16 @@ and attachable independently of Codex transcript persistence.
 
 Git synchronization is task-scoped. After claiming a new Bead and before
 editing, a worker verifies their worktree is clean and runs
-`git -C worktree merge --ff-only main` from their durable home. An idle branch
-is not updated in anticipation of future work. A non-fast-forward result or
-unique prior work is returned to MD for disposition; it is never forced away.
+`git -C worktree merge --ff-only <integration-branch>` from their durable home.
+`integration_branch` comes from that worker's `member.toml`; an instance branch
+usually receives core releases by merging `main` before worker work begins. An
+idle branch is not updated in anticipation of future work. A non-fast-forward
+result or unique prior work is returned to MD for disposition; it is never
+forced away.
 
 Workers may manage their own local worktree and branch. MD may manage all
 worker worktrees for lifecycle and validation purposes. Neither authority includes
 remote publication unless Aaron or MD separately directs it.
-
-Current roster:
-
-- [Nadia](nadia/README.md) — Worker; woman; she/her; ready
 
 The canonical model is [Rig's operating architecture](../ARCHITECTURE.md).
 Lifecycle policy is recorded in the [worker lifecycle

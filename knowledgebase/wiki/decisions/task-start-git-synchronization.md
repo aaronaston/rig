@@ -10,9 +10,10 @@ For a worker using the current compatibility `fleet/<worker>/` home in this
 local-only repository:
 
 1. Verify the worker worktree is clean and prior work is resolved.
-2. From the durable home, run `git -C worktree merge --ff-only main`.
+2. From the durable home, run `git -C worktree merge --ff-only <integration-branch>`,
+   using the value in the instance worker record.
 3. Begin implementation only after the fast-forward succeeds.
-4. At handoff, report whether `main` advanced after implementation began.
+4. At handoff, report whether the integration branch advanced after implementation began.
 
 The repository has no Git remote, so `git pull` is not the correct current
 command. If a remote is added later, remote fetch/pull behavior remains subject

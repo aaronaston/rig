@@ -10,11 +10,11 @@ blockers, and validates results. Worker expertise is supplied by the current
 Bead, project instructions, sources, tools, skills, and constraints rather than
 by a growing catalogue of permanent specialist roles.
 
-Nadia remains a unique named Worker and uses she/her pronouns. Her display name
-and stable slug address the durable collaborator. The prior Software Engineer
-role is superseded. Additional workers should be onboarded when Rig needs more
-durable concurrent capacity or another continuing working relationship, not
-merely because a task enters a new domain.
+Each instance selects unique named Workers and their pronouns. Their display
+names and stable slugs address durable collaborators. The prior Software
+Engineer specialization is superseded. Additional workers should be onboarded
+when an instance needs more durable concurrent capacity or another continuing
+working relationship, not merely because a task enters a new domain.
 
 Codex assigns a session ID to one saved conversation history. The ID can be
 resumed and a worker may accumulate several such IDs over time. It does not

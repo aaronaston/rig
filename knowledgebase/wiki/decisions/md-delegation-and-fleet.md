@@ -32,10 +32,9 @@ Workers may launch bounded native subagents. Those children are transient task
 threads, use task-specific labels rather than a durable worker's name, and
 remain under the parent worker's scope and accountability.
 
-For the first worker, MD selected **Nadia**, a woman using **she/her** pronouns.
-She is a generalist Worker; the earlier Software Engineer specialization is
-superseded. Her durable home is
-[`fleet/nadia/`](../../../fleet/nadia/README.md).
+Each instance selects and onboards its own named Workers. The earlier Software
+Engineer specialization is superseded; a worker is a generalist and their
+durable home belongs to the instance.
 
 Evidence: the original [operator direction](../sources/operator-fleet-direction.md)
 and the superseding [named-worker direction](../sources/operator-named-worker-direction.md).
