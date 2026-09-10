@@ -235,3 +235,12 @@ were checked. A staged independent operating repository restored 27 matching
 issue records plus the publication task's four matching historical comments.
 Live graphical validation and Nadia's migration trial remain outstanding;
 the original operating checkout and current task database remain authoritative.
+
+## [2026-09-10] migration | Project Beads ownership
+
+Moved active task authority to rig-test-instance-next/.beads after a final
+local Dolt backup/restore comparison. The original core checkout now uses a
+local ignored redirect; its original embedded data remains preserved. Verified
+recovery into a disposable independent Git clone: 28 issues restored, including
+the newly created Nadia core trial. Documented fresh-clone initialization,
+local backup locations, and rollback constraints. No remote sync occurred.

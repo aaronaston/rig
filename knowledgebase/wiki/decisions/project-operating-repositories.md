@@ -68,6 +68,40 @@ The old core-to-instance branch decision is retained as historical context.
 The implementation preserves colocated launcher compatibility while the live
 operating migration and database recovery are validated.
 
+## Local Beads ownership and recovery
+
+The local migration prepared the independent operating repository at
+`/Users/aaron/development/tpsi/rig-test-instance-next`. Its `.beads/` now owns
+the project database. The original core `.beads/redirect` points there, so
+existing core and linked-worktree entry points follow the same authority.
+The old embedded data remains physically preserved; never bypass the redirect
+and write to that archived copy. The legacy Git instance branch is retained.
+
+Before redirecting, a fresh Dolt-native backup was restored into the staged
+database. All 27 issue records and the migration/publication task comments
+matched. The pre-cutover backup remains under the operating home's
+`.beads/backups/pre-cutover`. Its ongoing local backup destination is
+`.beads/backups/current`. Run `bd backup sync` from the operating home after
+material task updates. A local backup on the same disk is not off-machine
+recovery; remote synchronization requires a separately selected destination.
+
+For a fresh clone, set rig.toml paths, enter its directory, run
+`bd init --prefix beads-tests --skip-hooks --skip-agents --non-interactive`,
+then restore the supplied Dolt-native backup with
+`bd backup restore /path/to/backup --force`. Use force only after verifying
+the newly initialized target is empty or its contents are preserved. The CLI
+requires initialization before restore even though its empty database already
+exists. Run `bd where`, `bd stats`, and compare representative task comments
+and full issue records before activation. Ordinary Git cloning alone does not
+restore tasks. For a different project, use its own prefix and database.
+
+The installed CLI rejects `bd -C /new/uninitialized/home init`; initialize with
+that directory as the actual working directory. It honors `BEADS_DIR` from
+worker worktrees. A disposable two-database test also verified that an explicit
+`.beads/redirect` takes precedence over the original local embedded database.
+Do not replace a live database with a stale snapshot during rollback: preserve
+post-cutover changes and reconcile them first.
+
 ## Validation commands
 
 Run the full suites from the software checkout:
