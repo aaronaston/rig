@@ -6,8 +6,10 @@ task queue.
 
 ## Authority
 
-- The MD seat and named workers are authorized to use local Git for assigned
-  work, subject to the scope in the applicable `AGENTS.md` files.
+- The MD seat and named workers are authorized to use local Git in their
+  assigned source worktrees, subject to the scope in the applicable
+  `AGENTS.md` files. The source repository owns implementation history; the
+  separate project operating home owns worker identity and project task state.
 - MD may create, inspect, repair, and retire worker worktrees and
   branches after preserving or deliberately disposing of unique work.
 - Workers may manage their own worktree and branch. They must not modify
@@ -20,14 +22,18 @@ task queue.
 
 ## Workflow
 
-- Run `bd ready`, then `bd show <id>` before starting assigned work.
+- Run `bd where`, `bd ready`, then `bd show <id>` before starting assigned work.
+- The operating launcher explicitly supplies `BEADS_DIR` to source worktrees.
+  `bd where` must resolve to the operating home's `.beads/` directory. Do not
+  initialize a nested worker-local database or treat the historical colocated
+  database path as the new authority; it remains compatibility material.
 - Create a Beads issue before implementation when no suitable issue exists.
 - Claim work with `bd update <id> --claim`.
 - After claiming and before the first edit, synchronize the owned branch from
   the current integration branch. Verify the worktree is clean and prior work
-  is resolved first. In this local-only repository, a worker using the retained
-  `fleet/<worker>/` compatibility home runs
-  `git -C worktree merge --ff-only main` from their durable home. Do not update
+  is resolved first. The worker's operating-home configuration declares that
+  branch; a core implementation worker runs
+  `git -C worktree merge --ff-only main` from the operating home. Do not update
   idle branches speculatively. If fast-forward is impossible, stop and return
   the divergence to MD without forcing, rebasing, or discarding.
 - Use inline `bd update` flags; do not use interactive `bd edit`.
@@ -53,5 +59,7 @@ bd close <id> --reason="Completed"
 bd stats
 ```
 
-The repository currently has no Git remote. Beads data is local unless Aaron or
-MD separately configures and directs synchronization.
+The source repository's remote configuration and the operating home's Beads
+database are separate concerns. Beads data remains under the operating home
+unless Aaron or MD separately configures and directs database synchronization;
+remote Git publication likewise remains separately authorized.

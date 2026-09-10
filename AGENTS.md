@@ -7,13 +7,18 @@ Read [ARCHITECTURE.md](ARCHITECTURE.md) for Rig's operating model and
 scope, and decisions. Follow [knowledgebase/AGENTS.md](knowledgebase/AGENTS.md)
 when maintaining the knowledgebase. Beads remains the task and status system;
 the knowledgebase contains durable documentation, not a parallel task queue.
-Aaron is the operator. Managing Director (MD), in root `md/`, is Aaron's
-singleton conversational delegate for requirements capture, Beads work
-definition, worker orchestration, and validation. MD uses they/them pronouns by
-their expressed preference. Durable named workers are generalists. The core
-repository intentionally has no onboarded worker; an instance branch supplies
-their identity and home. Runner, model, Codex session ID, and tmux process
-remain replaceable runtime properties. Ask design questions in visible replies.
+Aaron is the operator. Managing Director (MD), in the project's operating
+home, is Aaron's singleton conversational delegate for requirements capture,
+Beads work definition, worker orchestration, and validation. MD uses they/them
+pronouns by their expressed preference. Durable named workers are generalists.
+This source repository is implementation-only: it intentionally has no
+project-owned worker identity or Beads authority. A separate project operating
+home owns MD, worker identities, preferences, assignments, and the project
+database; assigned source worktrees receive that database through an explicitly
+supplied `BEADS_DIR`. Runner, model, Codex session ID, and tmux process remain
+replaceable runtime properties. The historical colocated and instance-branch
+layout remains compatibility material, not the ownership model. Ask design
+questions in visible replies.
 
 A Codex session launched through Rig may occupy the MD seat or a named worker
 identity. MD starts in `md/`; a worker currently starts in the compatibility
@@ -50,11 +55,13 @@ is idle and not merely because a session starts or reconnects. After claiming
 the Bead and before editing, verify the owned worktree is clean and prior work
 is resolved, then update the owned branch from the current integration branch.
 
-This repository currently has no Git remote, so a worker using the compatibility
-`fleet/<worker>/` home runs `git -C worktree merge --ff-only <integration-branch>`;
-this is not a `git pull`. The instance records that branch in its worker
-configuration; core-only workers use `main`. If the fast-forward is impossible or unique prior work remains,
-stop and return the conflict to MD without forcing, rebasing, or discarding.
+The worker's operating-home configuration records the assigned source
+repository and integration branch. A worker in an isolated source worktree
+runs `git -C worktree merge --ff-only <integration-branch>`; this is not a
+`git pull`. Core implementation workers normally integrate from `main`, while
+the operating home remains the source of worker identity and task state. If the
+fast-forward is impossible or unique prior work remains, stop and return the
+conflict to MD without forcing, rebasing, or discarding.
 At handoff, report whether the integration branch advanced during implementation. MD decides
 how any resulting divergence is integrated. Seats follow the same clean-state
 and current-base principle on their owned branch, subject to configured remotes
