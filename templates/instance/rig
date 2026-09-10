@@ -1,0 +1,17 @@
+#!/bin/sh
+# Run the selected Rig software with this directory as the operating home.
+set -eu
+instance_root=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+configured_software=$(sed -n 's/^software_root[[:space:]]*=[[:space:]]*"\([^"]*\)"[[:space:]]*$/\1/p' "$instance_root/rig.toml")
+software_root=${RIG_SOFTWARE_ROOT:-$configured_software}
+case "$software_root" in
+    '') printf '%s\n' 'Set software_root in rig.toml or RIG_SOFTWARE_ROOT.' >&2; exit 1 ;;
+    /*) ;;
+    *) software_root="$instance_root/$software_root" ;;
+esac
+software_root=$(CDPATH= cd -- "$software_root" && pwd)
+export RIG_INSTANCE_ROOT="$instance_root"
+if [ "$#" -eq 0 ]; then
+    exec "$software_root/bin/rig-emacs"
+fi
+exec "$software_root/bin/rig-fleet-emacs" "$@"

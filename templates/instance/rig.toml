@@ -1,0 +1,4 @@
+# Paths are relative to this operating home, or absolute.
+# The loaded software may be a tested checkout distinct from the source project.
+software_root = "../rig"
+project_root = "../rig"

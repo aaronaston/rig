@@ -55,25 +55,28 @@ and its process remain alive for later reopening.
 
 ## Core and instances
 
-`main` is Rig's worker-free core: the Emacs control center, shared worker
-defaults, templates, tests, and operating model. It deliberately has no
-onboarded worker manifests. A branch such as `test-instance` adds durable
-worker homes and its own operating configuration.
+`main` is Rig's worker-free software. Each project owns a dedicated team and
+Beads database in a separate operating repository. Start from
+[`templates/instance/`](templates/instance/), set `software_root` and
+`project_root` in `rig.toml`, and launch `./rig` there. `./rig worker-slug` opens
+a worker. The two paths may select different checkouts: tested software can
+run the team while workers change the assigned source repository.
 
-Core changes flow from `main` into an instance branch. Each worker's
-`member.toml` declares the instance integration branch it fast-forwards from at
-task start. That means a worker receives both the core release and the instance
-configuration without merging core directly into the worker branch.
+Worker manifests declare the source integration branch, usually `main`, not
+an instance branch. The launcher supplies the operating home's `BEADS_DIR`
+even when work happens in source worktrees. Existing colocated launchers remain
+supported. See the [bootstrap and migration procedure](knowledgebase/wiki/decisions/project-operating-repositories.md)
+before moving an existing team or database.
 
 To onboard a worker in an instance, copy the files in
 [`templates/worker/`](templates/worker/), substitute a unique slug and display
-name, set `integration_branch`, add the resulting worker home with `git add -f`,
+name, set `integration_branch`, track the home in the operating repository,
 then provision and launch them:
 
 ```sh
-./bin/rig-fleet-onboard --check <worker-slug>
-./bin/rig-fleet-onboard <worker-slug>
-./bin/rig-fleet-emacs <worker-slug>
+RIG_INSTANCE_ROOT=/path/to/operating-home ./bin/rig-fleet-onboard --check <worker-slug>
+RIG_INSTANCE_ROOT=/path/to/operating-home ./bin/rig-fleet-onboard <worker-slug>
+RIG_INSTANCE_ROOT=/path/to/operating-home ./bin/rig-fleet-emacs <worker-slug>
 ```
 
 The `fleet/` directory and `rig-fleet-*` commands are current compatibility

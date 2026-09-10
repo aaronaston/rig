@@ -157,11 +157,12 @@ User-facing documentation and the Roster call the group **Workers**. Renaming
 the storage and command surface is a separate migration because it affects
 worktrees, branches, tmux names, scripts, tests, and saved operating habits.
 
-The `main` branch is the worker-free Rig core. A durable worker belongs to an
-instance branch such as `test-instance`. Core releases flow from `main` into
-that branch. A worker's task-start synchronization uses its instance's declared
-integration branch, so it receives both the core release and the instance's
-configuration.
+The `main` branch is the worker-free Rig core. Each project owns a separate
+operating home, dedicated team, and Beads database. Its workers implement in
+isolated worktrees of the assigned source repository, based on that project's
+integration branch. Rig software is loaded from an explicitly selected checkout.
+The former `test-instance` branch layout is retained until migration is validated;
+see [project operating repositories](knowledgebase/wiki/decisions/project-operating-repositories.md).
 
 ## Deeper implementation questions
 

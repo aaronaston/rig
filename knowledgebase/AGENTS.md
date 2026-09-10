@@ -60,7 +60,8 @@ Check for orphan pages, missing index entries, broken links, stale claims, contr
 - Distinguish user requirements, accepted decisions, proposals, source claims, and inference.
 - Maintain one singleton Managing Director seat in root `md/`, with they/them
   pronouns by MD's expressed preference. Named generalist workers live under
-  the compatibility `fleet/` path in instance branches. The core `main` branch
+  the compatibility `fleet/` path in project operating repositories. The historical
+  instance branch remains until migration is validated. The core `main` branch
   contains no onboarded worker. Do not
   conflate the management seat, durable workers, or transient native subagents.
 - Treat display name, stable routing slug, durable home, Codex session ID, tmux

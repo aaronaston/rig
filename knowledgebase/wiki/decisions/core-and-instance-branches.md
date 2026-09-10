@@ -1,6 +1,8 @@
 # Core and instance branches
 
-Date: 2026-09-09. Status: accepted.
+Date: 2026-09-09. Status: superseded by the
+[project operating repository design](project-operating-repositories.md) on
+2026-09-10. Retained as the historical layout pending migration.
 
 Rig publishes a private repository named `aaronaston/rig`. The `main` branch is
 the reusable, worker-free core. It contains the control center, templates,

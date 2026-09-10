@@ -8,6 +8,8 @@ Start with the [overview](overview.md). Maintenance history is in the [log](log.
 
 ## Sources
 
+- [Operator project operating repository direction](sources/operator-project-operating-repositories.md): dedicated teams and databases, separate Rig dependency and project source.
+
 - [Wheelhouse](sources/wheelhouse.md): shared chat, two primary essays, and an explicit correction.
 - [Emacs terminal backends](sources/emacs-terminal-backends.md): observed built-in `term` limitations and the evidence for `vterm`.
 - [Operator fleet direction](sources/operator-fleet-direction.md): accepted delegation, fleet lifecycle responsibility, worktree homes, and mailbox uncertainty.
@@ -21,6 +23,8 @@ Start with the [overview](overview.md). Maintenance history is in the [log](log.
 - [Operator named-worker direction](sources/operator-named-worker-direction.md): accepted singleton MD, named generalist workers, worker-managed subagents, tmux visibility, blockers, and resumable Codex session IDs.
 
 ## Decisions
+
+- [Project operating repositories](decisions/project-operating-repositories.md): dedicated project teams and databases, separate software dependency and source worktrees; supersedes instance branches.
 
 - [Initial scope](decisions/initial-scope.md): confirmed requirements, including MD's they/them pronoun preference, and unresolved choices.
 - [Seat and worker session defaults](decisions/session-defaults.md): Sol/high for MD and inherited Luna/high for workers, with Codex session IDs modeled as resumable runtime history.

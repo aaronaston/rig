@@ -20,11 +20,16 @@
   "Manage Rig agent sessions from Emacs."
   :group 'tools)
 
-(defcustom rig-root
+(defconst rig-software-root
   (file-name-as-directory
    (expand-file-name ".." (file-name-directory
                            (or load-file-name buffer-file-name))))
-  "Absolute path to the Rig repository root."
+  "Directory containing the loaded Rig software, independent of the project.")
+
+(defcustom rig-root
+  (file-name-as-directory
+   (expand-file-name (or (getenv "RIG_INSTANCE_ROOT") rig-software-root)))
+  "Operating home containing this project's seats, workers, and rig.toml."
   :type 'directory
   :group 'rig)
 
@@ -123,6 +128,25 @@ worker-specific session-defaults.toml is optional and takes precedence."
       (append (rig--read-string-config-file session-file t)
               (rig--read-string-config-file member-file)))))
 
+(defun rig--project-root ()
+  "Return the source repository assigned to this operating home."
+  (file-name-as-directory
+   (expand-file-name
+    (or (plist-get (rig--read-string-config-file
+                   (expand-file-name "rig.toml" rig-root)) :project_root)
+        ".") rig-root)))
+
+(defun rig--beads-directory ()
+  "Return this project's explicit Beads directory."
+  (expand-file-name ".beads" rig-root))
+
+(defun rig--runtime-name (name)
+  "Scope NAME to the operating home, retaining legacy colocated names."
+  (if (file-equal-p rig-root rig-software-root)
+      name
+    (format "%s-%s" name
+            (substring (secure-hash 'sha256 (file-truename rig-root)) 0 12))))
+
 (defun rig--identity-from-manifest (file kind)
   "Return a Rig identity read from manifest FILE of KIND."
   (let* ((config (rig--read-string-config-file file t))
@@ -142,10 +166,11 @@ worker-specific session-defaults.toml is optional and takes precedence."
           :lifecycle (plist-get config :status)
           :home home
           :worktree (plist-get config :worktree)
-          :tmux (or (plist-get config :tmux_session)
-                    (if (eq kind 'fleet)
-                        (rig--fleet-tmux-session slug)
-                      (format "rig-%s" slug)))
+          :tmux (rig--runtime-name
+                 (or (plist-get config :tmux_session)
+                     (if (eq kind 'fleet)
+                         (format "rig-fleet-%s" slug)
+                       (format "rig-%s" slug))))
           :buffer (or (plist-get config :buffer_name)
                       (if (eq kind 'fleet)
                           (rig--fleet-buffer-name slug)
@@ -178,7 +203,9 @@ Worker manifests remain under fleet/ as a compatibility path."
 Return :unavailable when Beads cannot be queried."
   (condition-case nil
       (with-temp-buffer
-        (let ((status
+        (let* ((process-environment (copy-sequence process-environment))
+               (_ (setenv "BEADS_DIR" (rig--beads-directory)))
+               (status
                (process-file
                 (rig--required-executable "bd") nil t nil
                 "-C" (directory-file-name rig-root)
@@ -467,8 +494,10 @@ Return :unavailable when Beads cannot be queried."
   "Return the writable project areas for SEAT described by CONFIG."
   (let ((worktree (plist-get config :worktree)))
     (if worktree
-        (list (expand-file-name worktree (rig--seat-directory seat)))
-      (list rig-root))))
+        (append (list (expand-file-name worktree (rig--seat-directory seat)))
+                (when (file-directory-p (rig--beads-directory))
+                  (list (rig--beads-directory))))
+      (delete-dups (list rig-root (rig--project-root))))))
 
 (defun rig--ensure-work-areas (seat config)
   "Require all configured writable project areas for SEAT to exist."
@@ -556,14 +585,18 @@ or `unavailable' when tmux does not return valid metadata."
 
 (defun rig--session-process-command (seat)
   "Return the environment-wrapped process command for SEAT."
+  (unless (file-directory-p (rig--beads-directory))
+    (user-error "Missing project Beads directory: %s; initialize or restore it before launch"
+                (rig--beads-directory)))
   (let* ((config (rig--read-session-config seat))
          (command (rig--command-for-seat seat))
          (actor (plist-get config :beads_actor)))
-    (if actor
-        (append (list (rig--required-executable "env")
-                      (format "BEADS_ACTOR=%s" actor))
-                command)
-      command)))
+    (append (list (rig--required-executable "env")
+                  (format "BEADS_DIR=%s" (rig--beads-directory))
+                  (format "RIG_INSTANCE_ROOT=%s" rig-root)
+                  (format "RIG_SOFTWARE_ROOT=%s" rig-software-root))
+            (when actor (list (format "BEADS_ACTOR=%s" actor)))
+            command)))
 
 (defun rig-terminal-emacs-mode ()
   "Give Emacs normal control of keys in the current Rig terminal."
@@ -642,7 +675,7 @@ without consulting ambient display-buffer rules."
         (rig--show-terminal-buffer existing target-window)
       (when existing
         (kill-buffer existing))
-      (let* ((vterm-shell (expand-file-name "bin/rig-tmux-attach" rig-root))
+      (let* ((vterm-shell (expand-file-name "bin/rig-tmux-attach" rig-software-root))
              (vterm-kill-buffer-on-exit nil)
              (process-environment
               (cons (format "RIG_TMUX_SESSION=%s" name)
@@ -711,14 +744,14 @@ When TARGET-WINDOW is non-nil, keep the session in that exact window."
 (defun rig-md ()
   "Open MD in Emacs, creating its persistent session when necessary."
   (interactive)
-  (rig--open-session rig--md-seat rig--md-tmux-session
+  (rig--open-session rig--md-seat (rig--runtime-name rig--md-tmux-session)
                      rig--md-buffer-name "MD"))
 
 ;;;###autoload
 (defun rig-md-status ()
   "Report whether MD's persistent session is running."
   (interactive)
-  (rig--session-status rig--md-tmux-session "MD"))
+  (rig--session-status (rig--runtime-name rig--md-tmux-session) "MD"))
 
 ;;;###autoload
 (defun rig-md-detach ()
@@ -744,7 +777,7 @@ When TARGET-WINDOW is non-nil, keep the session in that exact window."
 
 (defun rig--fleet-tmux-session (member)
   "Return the compatibility tmux session name for worker MEMBER."
-  (format "rig-fleet-%s" member))
+  (rig--runtime-name (format "rig-fleet-%s" member)))
 
 (defun rig--fleet-buffer-name (member)
   "Return the compatibility Emacs buffer name for worker MEMBER."

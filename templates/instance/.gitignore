@@ -1,0 +1,7 @@
+# Preserve database history using a separate Beads backup, not ordinary Git.
+.beads/*
+!.beads/PRIME.md
+!.beads/README.md
+fleet/*/worktree/
+*.elc
+\#*\#

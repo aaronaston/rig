@@ -3,9 +3,10 @@
 `fleet/` is the compatibility location for durable homes for Rig's named
 generalist workers. The directory name is a compatibility surface; **Workers**
 is the current concept. The core `main` branch deliberately contains no worker
-home. An instance branch creates `fleet/<worker>/` from
-[`templates/worker/`](../templates/worker/) and adds that home with
-`git add -f`.
+home. A project operating repository creates `fleet/<worker>/` from
+[`templates/worker/`](../templates/worker/) and tracks that home independently
+of core. The former instance-branch layout remains only until migration;
+see [project operating repositories](../knowledgebase/wiki/decisions/project-operating-repositories.md).
 
 Each worker home is `fleet/<worker>/` and contains identity, operating
 instructions, and optional worker-specific session overrides. Shared
@@ -32,8 +33,9 @@ and attachable independently of Codex transcript persistence.
 Git synchronization is task-scoped. After claiming a new Bead and before
 editing, a worker verifies their worktree is clean and runs
 `git -C worktree merge --ff-only <integration-branch>` from their durable home.
-`integration_branch` comes from that worker's `member.toml`; an instance branch
-usually receives core releases by merging `main` before worker work begins. An
+`integration_branch` comes from that worker's `member.toml` and belongs to the
+assigned source repository, usually `main`. The operating repository selects
+the Rig software used to run the team independently of worker changes. An
 idle branch is not updated in anticipation of future work. A non-fast-forward
 result or unique prior work is returned to MD for disposition; it is never
 forced away.

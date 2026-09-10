@@ -217,3 +217,21 @@ Accepted private publication of `aaronaston/rig` with a worker-free `main`
 core and a `test-instance` branch holding the current Nadia environment.
 Documented the instance integration branch, the one-time retention merge, and
 the exclusion of live runtime state from core publication.
+
+## [2026-09-10] ingest | Project operating repositories
+
+Preserved Aaron's dedicated-project-team/database direction and acceptance of
+separate software and operating repositories. Recorded the replacement design,
+marked the branch decision superseded, and linked bootstrap/cutover/rollback.
+Implementation and live migration remain tracked by beads-tests-dze.17 and .16.
+
+## [2026-09-10] lint | Operating repository implementation
+
+Passed 30 ERT tests, strict byte compilation without retained artifacts,
+check-parens, shell syntax, and diff whitespace checks. The isolated topology
+test verified two independent Git/Beads operating homes, actual core-only
+worker commits, and source fast-forward integration. Relative Markdown links
+were checked. A staged independent operating repository restored 27 matching
+issue records plus the publication task's four matching historical comments.
+Live graphical validation and Nadia's migration trial remain outstanding;
+the original operating checkout and current task database remain authoritative.

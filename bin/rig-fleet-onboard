@@ -21,7 +21,19 @@ case "$member" in
         ;;
 esac
 
-rig_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+software_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+rig_root=$(CDPATH= cd -- "${RIG_INSTANCE_ROOT:-$software_root}" && pwd)
+project_root=$rig_root
+if [ -f "$rig_root/rig.toml" ]; then
+    configured_project=$(sed -n 's/^project_root[[:space:]]*=[[:space:]]*"\([^"]*\)"[[:space:]]*$/\1/p' "$rig_root/rig.toml")
+    if [ -n "$configured_project" ]; then
+        case "$configured_project" in
+            /*) project_root=$configured_project ;;
+            *) project_root="$rig_root/$configured_project" ;;
+        esac
+    fi
+fi
+project_root=$(CDPATH= cd -- "$project_root" && pwd)
 member_home="$rig_root/fleet/$member"
 member_config="$member_home/member.toml"
 
@@ -61,9 +73,11 @@ if [ -e "$member_home/$worktree" ]; then
 fi
 
 if [ "$check_only" = true ]; then
-    printf 'member=%s\nhome=%s\nworktree=%s\nbranch=%s\nintegration_branch=%s\n' \
-        "$member" "$member_home" "$member_home/$worktree" "$branch" "$integration_branch"
+    git -C "$project_root" rev-parse --verify "$integration_branch^{commit}" >/dev/null
+    printf 'member=%s\nhome=%s\nproject=%s\nworktree=%s\nbranch=%s\nintegration_branch=%s\n' \
+        "$member" "$member_home" "$project_root" "$member_home/$worktree" "$branch" "$integration_branch"
     exit 0
 fi
 
-exec bd -C "$rig_root" worktree create "fleet/$member/$worktree" --branch "$branch"
+exec git -C "$project_root" worktree add -b "$branch" \
+    "$member_home/$worktree" "$integration_branch"

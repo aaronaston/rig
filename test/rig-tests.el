@@ -16,7 +16,8 @@
   "Run BODY with an isolated temporary Rig root."
   (declare (indent 0) (debug t))
   `(let* ((root (make-temp-file "rig-test-" t))
-          (rig-root (file-name-as-directory root)))
+          (rig-root (file-name-as-directory root))
+          (rig-software-root rig-root))
      (unwind-protect
          (progn ,@body)
        (rig--roster-cancel-refresh)
