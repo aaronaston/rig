@@ -244,3 +244,14 @@ local ignored redirect; its original embedded data remains preserved. Verified
 recovery into a disposable independent Git clone: 28 issues restored, including
 the newly created Nadia core trial. Documented fresh-clone initialization,
 local backup locations, and rollback constraints. No remote sync occurred.
+
+## [2026-09-11] validation | Independent operating home accepted
+
+Reviewed Nadia's core-only trial commit 8efd851 and finished her already-written
+command-directory correction as 97d8a63 after the worker's approval reviewer hit
+a usage limit. Both integrated by fast-forward. Marked Nadia ready in the new
+operating repository and associated the existing MD tmux process with its scoped
+name without starting another MD. Retained old homes, source branch, and database
+archive. Current source and operating repositories are locally committed; remote
+publication and graphical Emacs/vterm interaction remain separate from this
+accepted local migration. The architecture note records the validation limits.

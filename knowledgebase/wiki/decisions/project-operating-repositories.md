@@ -3,6 +3,21 @@
 Date: 2026-09-10. Status: accepted design; migration tracked in
 `beads-tests-dze.17`, database portability in `beads-tests-dze.16`.
 
+Local implementation and migration accepted 2026-09-11. The operating
+repository remains at `rig-test-instance-next` to preserve the historical
+`rig-test-instance` checkout. Remote publication is a separate release step.
+Nadia's live trial produced core commit 8efd851; MD finished her reviewed
+wording correction as 97d8a63 after a usage-limit interruption, then integrated
+both by fast-forward. Her new home is ready. The existing MD tmux process was
+renamed to the operating-home-scoped identity without restarting its saved
+conversation. Its working directory remains the legacy source md/ until a
+deliberate fresh restart; database access follows the verified redirect.
+
+Validation includes 30 passing ERT tests, strict compilation, shell syntax,
+check-parens, Markdown links, two-project Git/Beads isolation and recovery,
+and live tmux/Roster discovery. Graphical Emacs/vterm interaction was not
+retested during this migration; the window-placement regression tests passed.
+
 Aaron clarified that each project has a dedicated team and Beads database.
 He agreed to separate `aaronaston/rig` software from a private operating
 repository, provisionally `aaronaston/rig-test-instance`, and directed MD to
