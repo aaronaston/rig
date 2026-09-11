@@ -5,6 +5,8 @@
 .beads-credential-key
 .beads/proxieddb/
 .beads/interactions.jsonl
+.beads/dolt-backup.json
+.beads/dolt-backup-state.json
 
 # Emacs lock files are local editor state.
 \#*\#
