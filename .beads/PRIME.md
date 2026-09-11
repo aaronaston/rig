@@ -32,10 +32,11 @@ task queue.
 - After claiming and before the first edit, synchronize the owned branch from
   the current integration branch. Verify the worktree is clean and prior work
   is resolved first. The worker's operating-home configuration declares that
-  branch; a core implementation worker runs
-  `git -C worktree merge --ff-only main` from the operating home. Do not update
-  idle branches speculatively. If fast-forward is impossible, stop and return
-  the divergence to MD without forcing, rebasing, or discarding.
+  branch; from the durable worker home—not from the operating repository root
+  or inside the source worktree—a core implementation worker runs
+  `git -C worktree merge --ff-only main`. Do not update idle branches
+  speculatively. If fast-forward is impossible, stop and return the divergence
+  to MD without forcing, rebasing, or discarding.
 - Use inline `bd update` flags; do not use interactive `bd edit`.
 - Keep discovered follow-up work, dependencies, and blockers in Beads rather
   than Markdown TODO lists.

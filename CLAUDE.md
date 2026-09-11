@@ -56,12 +56,13 @@ the Bead and before editing, verify the owned worktree is clean and prior work
 is resolved, then update the owned branch from the current integration branch.
 
 The worker's operating-home configuration records the assigned source
-repository and integration branch. A worker in an isolated source worktree
-runs `git -C worktree merge --ff-only <integration-branch>`; this is not a
-`git pull`. Core implementation workers normally integrate from `main`, while
-the operating home remains the source of worker identity and task state. If the
-fast-forward is impossible or unique prior work remains, stop and return the
-conflict to MD without forcing, rebasing, or discarding.
+repository and integration branch. From the durable worker home—not from the
+operating repository root or inside the source worktree—a worker runs
+`git -C worktree merge --ff-only <integration-branch>`; this is not a `git pull`.
+Core implementation workers normally integrate from `main`, while the
+operating home remains the source of worker identity and task state.
+If the fast-forward is impossible or unique prior work remains, stop and
+return the conflict to MD without forcing, rebasing, or discarding.
 At handoff, report whether the integration branch advanced during implementation. MD decides
 how any resulting divergence is integrated. Seats follow the same clean-state
 and current-base principle on their owned branch, subject to configured remotes
